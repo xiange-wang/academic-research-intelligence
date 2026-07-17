@@ -1,6 +1,6 @@
 # 现有方案扫描与可借鉴方法
 
-> 版本:v1.1(审查修订版,见 review_report.md) · 调研日期:2026-07-17
+> 版本:v1.2(二轮审查修订版,见 review_report.md) · 调研日期:2026-07-17
 > 目的:全网扫描与本系统定位相近的**开源项目、商业产品、学术系统**,回答三个问题:哪些轮子不用重造、哪些方法已被验证可直接采用、我们的差异化空间是否依然成立。
 > 与 `knowledgebase.md` 的关系:knowledgebase 第 3.5 节是竞品功能清单;本文件深入到**方法与架构层**,并覆盖开源生态。
 
@@ -116,7 +116,7 @@
 - UX:Describe(AI 追问澄清)→ Explore → Build(逐篇解释"为何与你的目标相关")→ **Keep up 持续订阅**。
 
 **Elicit(准确率沟通的标杆)**
-- 2026-05 大规模评估(994 篇 Cochrane 综述):检索 recall 95.0%;摘要筛选 sensitivity 96.89% / specificity 92.54%(小数位出自完整评估报告,官方博客口径为整数 97%——待核);对照人类单人 86.6%、双人 97.5% → "超单人、近双人";提取 95.6% 正确。
+- 2026-05 大规模评估(994 篇 Cochrane 综述,38,493 条记录):检索 recall 95.0%;摘要筛选 **96.89% recall / 92.54% specificity / 93.21% accuracy**(已核实:官方博客 evaluating-elicit-slr 原文);对照人类单人 86.6%、双人 97.5% → "超单人、近双人";全文筛选 99.5% recall;提取 95.6% 正确。
 - **关键演化**:2025-03 时 specificity 仅 62.8% → 一年提到 92.5%——高灵敏筛选的假阳性是最难啃的,且宣传页只报 recall。
 - 人机协作:每个结论附原文引句+高亮位置;用户可覆盖 AI 判断并记录理由;非对称阈值(Maybe 保留,strict No 才剔除)。
 - 可抄的评估协议:17 名非用户 PhD 用真实问题盲评多产品,**top-5 论断逐条核引用(正确 1 / 小错 0.5 / 大错 0)**+ Wilcoxon 检验。
@@ -124,7 +124,7 @@
 
 **scite(引用语境分类的全部工程细节 + 反面教材)**
 - 管线:GROBID(PDF)+ Pub2TEI(出版商 XML)统一 TEI → biblio-glutton 对 Crossref 匹配;引用语境定位率 PDF 路径 ~70%、XML 路径 ~95%。
-- 分类器:SciBERT 微调;5 万条专家标注;**真实分布 mentioning 92.6% / supporting 6.5% / disputing 0.8%** 的极端不平衡是根本难题;生产原则:**调类权重保证每类 precision>80%,宁漏勿错**。当前 disputing P .85 / R .45(分布与 P/R 数字出自 2021 论文正文,本次未能回溯核实——待核)。
+- 分类器:SciBERT 微调;5 万条专家标注;**真实分布 mentioning 92.6% / supporting 6.5% / disputing 0.8%** 的极端不平衡是根本难题;生产原则:**调类权重保证每类 precision>80%,宁漏勿错**。当前 disputing P .85 / R .45(分布与 P/R 数字出自 2021 论文正文;二次核实未果——论文存在性与三分类法已证实(QSS 2(3):882, DOI:10.1162/qss_a_00146),但正文数字被 MIT Press 机器人验证与 bioRxiv 403 阻断,待第三方转载或机构订阅核对——待核)。
 - **第三方打脸数据(必读)**:Bakker et al. 实测 324 条引用撤稿文献的引文,人工判 contrasting 17 条,scite 判 0 条——**徽章上"0 条反驳"多半是"没抓到"而非"没人反驳",缺失 ≠ 不存在**,UI 必须提示覆盖率。
 
 **Consensus(聚合 meter 的护栏设计)**
@@ -147,7 +147,7 @@
 - **Feedly AI(信息量最大的相邻产品)**:1000+ 预置 AI 模型作**语义原子**,用户 AND/OR/NOT 布尔组合成 feed;内容去重阈值 85%+同源不去重;**归因式负反馈**(downvote 必须指明原因,选"其他"时不更新模型);官方调参目标**每 feed 每周 10–20 篇**(防警报疲劳第一原则)。
 - Semantic Scholar Feeds:收藏即正样本;官方冷启动配方"5 正 + 3 负";推荐池只取近 3 个月论文(显式新颖性窗口)。
 
-### 2.2 设计模式清单(44 条精选,注明出处)
+### 2.2 设计模式清单(精选,注明出处)
 
 **订阅建模**:语义原子+布尔组合(Feedly);一句话建监控(PatSnap/Undermind);实体×切面二元建模(AlphaSense);个人语料即画像(zotero-arxiv-daily/AMiner);订阅对象升维为"论文集"(AMiner PaperSet)。
 
@@ -179,7 +179,7 @@
 
 ### 3.1 系统笔记
 
-**OpenScholar(UW + Ai2)** — arXiv:2411.14199,Apache-2.0 全开源(代码/模型/数据/datastore);据称正式版发表于 Nature 2026-02(**未能直接核实条目——待核**)
+**OpenScholar(UW + Ai2)** — arXiv:2411.14199,Apache-2.0 全开源(代码/模型/数据/datastore);正式版已核实发表于 **Nature 650(8103):857–863,2026-02,DOI:10.1038/s41586-025-10072-4**(Nature 版标题为 "Synthesizing scientific literature with retrieval-augmented language models",不含 "OpenScholar" 字样)
 - 数据:peS2o 4500 万论文,正文按 **250 词切 chunk、chunk 前拼论文标题**,2.34 亿 passages。
 - 检索器训练配方(可直接照搬):bi-encoder = Contriever 在 peS2o 上继续对比学习;cross-encoder = BGE-reranker,训练数据**自合成**(摘要生成 query → 召回 top-10 → Llama 3 70B 打 1–5 分,4–5 为正例)。
 - Pipeline:检索→重排→初稿→**自反馈迭代(≤3 条,信息不足则补检索)**→**逐句引用验证**。
@@ -203,8 +203,8 @@
 
 **自动科研 agent(AI-Scientist / Agent Laboratory 类)——主要是反面教训**
 - Agent Laboratory:自动评审 6.1 分 vs 人类 3.8 分,**系统性虚高**;"成本降 84%"的基线是 AI Scientist 而非人类。
-- MLR-Bench:**约 80% 案例含伪造/未验证实验结果**(转述自论文正文,未回溯核实——待核);PaperBench:最佳模型复现分 21%,未超 PhD;LLM 评审可被 prompt 注入操纵至"100% 接收级评分"(arXiv:2509.10248)。
-- Kosmos(2025-11):数据分析陈述准确率 85.5%、文献综述 82.1%,**结论性陈述仅 57.9%**(三个数字转述自论文正文,未回溯核实——待核)——越接近"下结论"越不可靠。
+- MLR-Bench:**约 80% 案例含伪造/未验证实验结果**(已核实:摘要原句 "frequently (e.g., in 80% of the cases) produce fabricated or invalidated experimental results");PaperBench:最佳模型复现分 21%,未超 PhD;LLM 评审可被 prompt 注入操纵至"100% 接收级评分"(arXiv:2509.10248)。
+- Kosmos(2025-11):数据分析陈述准确率 85.5%、文献综述 82.1%,**综合结论性陈述(synthesis statements)仅 57.9%**(已核实:全文,基于 102 条陈述的专家判定)——越接近"下结论"越不可靠。
 - 社区共识分层:**可靠**=RAG+溯源的综述、结构化写作;**部分可靠**=idea 候选生成;**不可靠**=自动评分、novelty 判断、实验结果、裸 LLM 引用。
 
 **文献嵌入与个性化排序**
@@ -251,7 +251,7 @@
 | 组件 | 来源 | 证据强度 |
 |---|---|---|
 | 个性化排序内核 | Scholar Inbox 配方(GTE 嵌入+per-user 逻辑回归+随机负例+主动学习冷启动) | ACL 2025 论文,80 万评分实测 |
-| 检索器与训练配方 | OpenScholar(权重可下载,reranker 训练数据自合成法) | Nature 2026,Apache-2.0 |
+| 检索器与训练配方 | OpenScholar(权重可下载,reranker 训练数据自合成法) | Nature 650:857–863(2026,已核实 DOI:10.1038/s41586-025-10072-4),Apache-2.0 |
 | chunk 级"评分+摘要" | PaperQA2 RCS | LitQA2 评测,Apache-2.0 |
 | 报告生成骨架 | STORM 多视角提问+大纲评测 / deep research 框架五模式 | NAACL 2024,MIT |
 | 研究空白候选生成 | Impact4Cast(KG link prediction,AUC>0.9,代码+数据 MIT) | MLST 2025 |
@@ -278,11 +278,13 @@
 
 ### 4.2 对 MVP 的修正建议(回写 knowledgebase 第 17 章的输入)
 
+> **状态(v1.2 回执)**:以下建议已全部并入 knowledgebase(①→§11.2/§17.1;②→§10.1/§10.4;③→§10.1 原则④;④→§17.1 架构备注;⑤→§9.6;⑥→§18 三期)。本节保留作决策记录。
+
 1. 个性化排序从"简化四维评分"升级为 **Scholar Inbox 配方**(工程量更小、有验证);冷启动采纳"5 正 3 负"显式配方;
 2. 周报增加**流量预算**(每方向每周 10–20 篇)与**归因式负反馈按钮**;
 3. 质量门禁补充"**缺失≠不存在**"覆盖声明(与既有覆盖声明机制合并);
 4. 部署路线确认:GitHub Actions 零服务器起步(注意 60 天停摆与并发写坑)→ 量大迁 Cloudflare;
-5. 研究空白模块(二期)技术路线确定:Impact4Cast + Owl 检索验证 + SciMuse 基准校准 + 穷尽度曲线展示;
+5. 研究空白模块(二期内测、三期公开,与 kb §18 对齐)技术路线确定:Impact4Cast + Owl 检索验证 + SciMuse 基准校准 + 穷尽度曲线展示;
 6. 新增待评估项:MCP server / agent 技能形态的分发(2026 窗口期)。
 
 ### 4.3 许可证与风险备忘
