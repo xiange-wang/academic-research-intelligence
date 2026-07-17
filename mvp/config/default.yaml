@@ -1,0 +1,49 @@
+# 设计初值(knowledgebase v1.3)。全部可回测校准,不得硬编码到源码。
+lake:
+  # 共享摄入湖(kb 2.3):按学科增量,禁止 per-user 持续性对外查询
+  fields:            # OpenAlex field ids
+    computer_science: 17
+    medicine: 27
+    mathematics: 26
+  daily_request_budget: 100        # 无 key $0.01/天 ≈ 100 次 list;有 key 放宽到 8000
+  mailto: "gairy.yu@gmail.com"
+
+arxiv:
+  categories: ["cs.CL", "cs.LG"]
+  rate_limit_seconds: 3            # kb 3.1.4: 1 req / 3s
+  page_size: 200
+
+dedup:                              # kb 15.4:错误合并代价高于漏合并 → 保守阈值
+  title_similarity_threshold: 0.92
+  require_author_overlap: true
+
+venue_tiers:                        # kb 5.2 判定参数
+  s_percentile: 95
+  s_corroboration_percentile: 90
+  a_percentile_low: 80
+  b_percentile_low: 50
+  demotion_on_flag: 1               # 有红旗未达预警 → 降 1 级并标注(v1.3 规则)
+  red_flag_growth_ratio: 3.0        # R3: 年发文量同比 >300%
+  red_flag_growth_abs: 2000
+
+ranking:                            # kb 11.2 Scholar Inbox 配方
+  cold_start_min_pos: 5
+  cold_start_min_neg: 3
+  easy_negatives: 500               # 随机未交互论文作 easy negatives(生产建议 5000)
+  score_range: [-100, 100]
+  lr_C: 0.1                         # Scholar Inbox 论文超参
+  no_abstract_confidence_penalty: 0.3   # 实验2:约 25–30% 论文无摘要 → 降置信度
+
+credibility:                        # kb 6.5 扣分制(独立于加权和)
+  start: 100
+  retracted: "veto"                 # 综合分置 0 + 红旗(公式外覆盖)
+  warning_venue_cap: 20             # 可信度 ≤20 且档位封顶"收录可查"
+  pubpeer_hit: -30                  # 并转人工
+  preprint: -10
+
+report:                             # kb 10.1 流量预算(硬上限)
+  must_read_min: 3
+  must_read_max: 5
+  worth_attention_max: 15
+  weekly_total_cap: 20
+  recency_window_days: 7
