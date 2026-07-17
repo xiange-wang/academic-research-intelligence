@@ -4,6 +4,7 @@
 
 - **[knowledgebase.md](knowledgebase.md)** — 完整知识库(20 章,数据源地图 / 期刊分级 / 评分模型 / 趋势识别 / 研究空白 / 合规风险)
 - [academic_research_system_prompt.md](academic_research_system_prompt.md) — 原始调研任务书
-- [docs/index.html](docs/index.html) — 网页版(可用于 GitHub Pages)
+- **[related_solutions.md](related_solutions.md)** — 现有方案扫描与可借鉴方法(开源项目 / 商业产品方法深挖 / LLM 科研助手系统)
+- [docs/index.html](docs/index.html) — 网页版(GitHub Pages)
 
 技术栈选型(第 13、14 章)按计划暂缓,待方法论评审后进行。
