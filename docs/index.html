@@ -1,0 +1,2140 @@
+<title>学术研究情报系统 · 方法论知识库</title>
+<style>
+:root{
+  --ground:#fafaf8; --surface:#f1f1ec; --ink:#22292e; --muted:#5e6b70;
+  --accent:#0e6b5c; --accent-soft:#e3efec; --warn:#a4512c; --hairline:#e3e6e2;
+  --code-bg:#eef0ed; --mark:#f5efe0;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --ground:#131719; --surface:#1b2124; --ink:#d7dddc; --muted:#8b9694;
+    --accent:#46b79e; --accent-soft:#1c2f2b; --warn:#d98a63; --hairline:#2a3134;
+    --code-bg:#1e2529; --mark:#2e2a1e; }
+}
+:root[data-theme="dark"]{ --ground:#131719; --surface:#1b2124; --ink:#d7dddc; --muted:#8b9694;
+  --accent:#46b79e; --accent-soft:#1c2f2b; --warn:#d98a63; --hairline:#2a3134;
+  --code-bg:#1e2529; --mark:#2e2a1e; }
+:root[data-theme="light"]{ --ground:#fafaf8; --surface:#f1f1ec; --ink:#22292e; --muted:#5e6b70;
+  --accent:#0e6b5c; --accent-soft:#e3efec; --warn:#a4512c; --hairline:#e3e6e2;
+  --code-bg:#eef0ed; --mark:#f5efe0; }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Source Han Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  font-size:16px;line-height:1.85;}
+.layout{display:flex;min-height:100vh}
+
+nav.toc{position:sticky;top:0;align-self:flex-start;max-height:100vh;overflow-y:auto;
+  width:264px;flex:0 0 264px;padding:2.2rem 1.1rem 2.2rem 1.4rem;border-right:1px solid var(--hairline);}
+.toc-head{font-family:"Noto Serif SC","Songti SC","SimSun",Georgia,serif;font-size:.95rem;font-weight:700;
+  letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin:0 0 1rem .35rem;}
+.toc-link{display:flex;gap:.55em;align-items:baseline;padding:.28rem .45rem;border-radius:4px;
+  color:var(--muted);text-decoration:none;font-size:.86rem;line-height:1.45;}
+.toc-link:hover{color:var(--ink);background:var(--surface)}
+.toc-link.active{color:var(--accent);background:var(--accent-soft);font-weight:600}
+.toc-num{font-variant-numeric:tabular-nums;min-width:1.4em;text-align:right;font-size:.78rem;opacity:.75}
+
+main{flex:1;min-width:0;padding:3rem 2.4rem 6rem}
+.page{max-width:46rem;margin:0 auto}
+
+header.masthead{margin-bottom:2.8rem;border-bottom:2px solid var(--ink);padding-bottom:1.6rem}
+.eyebrow{font-size:.78rem;letter-spacing:.22em;color:var(--accent);font-weight:600;margin:0 0 .8rem}
+h1{font-family:"Noto Serif SC","Songti SC","SimSun",Georgia,serif;font-size:2.05rem;line-height:1.3;
+  margin:0;font-weight:700;text-wrap:balance}
+.masthead .meta{color:var(--muted);font-size:.88rem;margin-top:.9rem}
+
+h2{font-family:"Noto Serif SC","Songti SC","SimSun",Georgia,serif;font-size:1.5rem;line-height:1.35;
+  margin:3.2rem 0 1rem;padding-top:1.4rem;border-top:1px solid var(--hairline);font-weight:700;text-wrap:balance}
+h3{font-size:1.13rem;margin:2.1rem 0 .6rem;font-weight:700;text-wrap:balance}
+h4{font-size:1rem;margin:1.6rem 0 .5rem;font-weight:700}
+p{margin:.75rem 0}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
+strong{font-weight:700}
+ul,ol{padding-left:1.5em;margin:.75rem 0}
+li{margin:.3rem 0}
+
+blockquote{margin:1.1rem 0;padding:.7rem 1.1rem;border-left:3px solid var(--accent);
+  background:var(--surface);color:var(--muted);border-radius:0 6px 6px 0;font-size:.93rem}
+blockquote p{margin:.3rem 0}
+
+.table-wrap{overflow-x:auto;margin:1.2rem 0;border:1px solid var(--hairline);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:.86rem;line-height:1.6;
+  font-variant-numeric:tabular-nums}
+th{background:var(--surface);text-align:left;font-weight:700;white-space:nowrap}
+th,td{padding:.5rem .7rem;border-bottom:1px solid var(--hairline);vertical-align:top;min-width:6em}
+tr:last-child td{border-bottom:none}
+
+code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.86em;
+  background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+pre{background:var(--code-bg);border:1px solid var(--hairline);border-radius:6px;
+  padding:1rem 1.2rem;overflow-x:auto;line-height:1.6;font-size:.84rem}
+pre code{background:none;padding:0}
+hr{border:none;border-top:1px solid var(--hairline);margin:2.5rem 0}
+
+.toc-toggle{display:none}
+@media (max-width: 900px){
+  .layout{display:block}
+  nav.toc{position:static;width:auto;max-height:none;border-right:none;
+    border-bottom:1px solid var(--hairline);padding:1.2rem 1.4rem;display:none}
+  nav.toc.open{display:block}
+  .toc-toggle{display:block;position:sticky;top:0;z-index:5;width:100%;text-align:left;
+    background:var(--ground);color:var(--accent);border:none;border-bottom:1px solid var(--hairline);
+    padding:.8rem 1.4rem;font-size:.9rem;font-weight:600;cursor:pointer}
+  main{padding:1.8rem 1.3rem 4rem}
+}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
+</style>
+<button class="toc-toggle" aria-expanded="false">☰ 目录</button>
+<div class="layout">
+<nav class="toc" aria-label="章节目录">
+<p class="toc-head">目录 · 20 章</p>
+<a class="toc-link" href="#1-项目定义与目标"><span class="toc-num">1</span><span>项目定义与目标</span></a>
+<a class="toc-link" href="#2-系统适用范围与边界"><span class="toc-num">2</span><span>系统适用范围与边界</span></a>
+<a class="toc-link" href="#3-学术数据源地图"><span class="toc-num">3</span><span>学术数据源地图</span></a>
+<a class="toc-link" href="#4-顶级期刊与会议识别方法"><span class="toc-num">4</span><span>顶级期刊与会议识别方法</span></a>
+<a class="toc-link" href="#5-跨学科学术质量评价框架"><span class="toc-num">5</span><span>跨学科学术质量评价框架</span></a>
+<a class="toc-link" href="#6-论文重要性评分模型"><span class="toc-num">6</span><span>论文重要性评分模型</span></a>
+<a class="toc-link" href="#7-最新研究趋势识别方法"><span class="toc-num">7</span><span>最新研究趋势识别方法</span></a>
+<a class="toc-link" href="#8-重点论文总结标准"><span class="toc-num">8</span><span>重点论文总结标准</span></a>
+<a class="toc-link" href="#9-研究空白与研究机会识别方法"><span class="toc-num">9</span><span>研究空白与研究机会识别方法</span></a>
+<a class="toc-link" href="#10-周报和月报设计"><span class="toc-num">10</span><span>周报和月报设计</span></a>
+<a class="toc-link" href="#11-用户兴趣与学科分类体系"><span class="toc-num">11</span><span>用户兴趣与学科分类体系</span></a>
+<a class="toc-link" href="#12-自动化研究工作流-方法论层"><span class="toc-num">12</span><span>自动化研究工作流(方法论层)</span></a>
+<a class="toc-link" href="#13-技术架构建议"><span class="toc-num">13</span><span>技术架构建议</span></a>
+<a class="toc-link" href="#14-数据库与知识库设计"><span class="toc-num">14</span><span>数据库与知识库设计</span></a>
+<a class="toc-link" href="#15-数据质量控制"><span class="toc-num">15</span><span>数据质量控制</span></a>
+<a class="toc-link" href="#16-版权-合规与伦理风险"><span class="toc-num">16</span><span>版权、合规与伦理风险</span></a>
+<a class="toc-link" href="#17-推荐的最小可行产品-mvp"><span class="toc-num">17</span><span>推荐的最小可行产品(MVP)</span></a>
+<a class="toc-link" href="#18-后续迭代路线"><span class="toc-num">18</span><span>后续迭代路线</span></a>
+<a class="toc-link" href="#19-核心参考资料"><span class="toc-num">19</span><span>核心参考资料</span></a>
+<a class="toc-link" href="#20-结论与推荐方案"><span class="toc-num">20</span><span>结论与推荐方案</span></a>
+</nav>
+<main><div class="page">
+<header class="masthead">
+<p class="eyebrow">ACADEMIC RESEARCH INTELLIGENCE</p>
+<h1>学术研究情报系统<br>方法论知识库</h1>
+<p class="meta">v1.0 · 2026-07-17 · 第一阶段:方法论与信息源设计 · 基于 6 组并行网络调研,未核实项显式标注</p>
+</header>
+<blockquote>
+<p>版本:v1.0(第一阶段完成:方法论与信息源设计)
+日期:2026-07-17
+状态说明:第 1–12、15–20 章已完成,基于 2026 年 7 月的真实网络调研(6 组并行调研,来源均已标注,未核实项显式标记)。<strong>技术栈选型(第 13、14 章)按项目要求暂缓</strong>,仅保留设计约束(见 2.3)与实体模型草案;待方法论评审通过后进入选型阶段。</p>
+</blockquote>
+<hr />
+<h2 id="1-项目定义与目标">1. 项目定义与目标</h2>
+<h3 id="1-1-一句话定义">1.1 一句话定义</h3>
+<p>一个<strong>面向多学科的学术研究情报系统</strong>:用户声明一个研究方向(学科 / 方向 / 具体主题),系统持续采集该方向的新论文,评估其重要性与可信度,识别趋势与研究空白,并以<strong>周报 / 月报 / 重点推荐</strong>的形式交付。</p>
+<h3 id="1-2-核心能力-与需求逐条对应">1.2 核心能力(与需求逐条对应)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>能力</th>
+<th>本知识库对应章节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>用户选择学科 / 方向 / 主题</td>
+<td>第 11 章</td>
+</tr>
+<tr>
+<td>2</td>
+<td>持续检索最新论文</td>
+<td>第 3、12 章</td>
+</tr>
+<tr>
+<td>3</td>
+<td>优先识别顶刊、顶会、高影响力机构成果</td>
+<td>第 4、5 章</td>
+</tr>
+<tr>
+<td>4</td>
+<td>判断论文重要性、创新性、可信度、影响</td>
+<td>第 6 章</td>
+</tr>
+<tr>
+<td>5</td>
+<td>总结主要方向、进展与争议</td>
+<td>第 7、8 章</td>
+</tr>
+<tr>
+<td>6</td>
+<td>生成周报与月报</td>
+<td>第 10 章</td>
+</tr>
+<tr>
+<td>7</td>
+<td>识别未解决问题与研究空白</td>
+<td>第 9 章</td>
+</tr>
+<tr>
+<td>8</td>
+<td>推荐值得深读的论文与可研究的方向</td>
+<td>第 6、9、10 章</td>
+</tr>
+<tr>
+<td>9</td>
+<td>跨学科适用</td>
+<td>贯穿各章的"学科差异"小节</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="1-3-系统的角色定位-方法论层的三个基本立场">1.3 系统的角色定位(方法论层的三个基本立场)</h3>
+<ol>
+<li><strong>情报系统,不是评审系统。</strong> 系统输出的是"值得关注的信号 + 证据",不是对论文的终审判断。所有评分都必须可解释、可追溯到具体特征。</li>
+<li><strong>提示器,不是承诺器。</strong> 研究机会输出的是"有证据支持的候选方向 + 不确定性说明",绝不将推测包装为确定可行的结论(详见 9.5、15 章)。</li>
+<li><strong>多信号融合,不迷信任何单一指标。</strong> 影响因子、引用数、venue 等级都只是信号之一;系统必须显式对抗"单指标霸权"(DORA / Leiden Manifesto 的核心要求,详见第 5 章)。</li>
+</ol>
+<hr />
+<h2 id="2-系统适用范围与边界">2. 系统适用范围与边界</h2>
+<h3 id="2-1-适用范围">2.1 适用范围</h3>
+<ul>
+<li><strong>学科</strong>:目标覆盖 STEM + 医学 + 社会科学;人文学科(依赖专著、非英语文献)列为受限支持,在报告中显式声明覆盖不足。</li>
+<li><strong>文献类型</strong>:期刊论文、会议论文、预印本、综述 / 系统综述、指南与共识声明、数据集 / 基准论文。专著、学位论文、专利列为二期扩展。</li>
+<li><strong>语言</strong>:一期以英语文献为主,元数据层面兼容多语言;中文文献源(CNKI 等)列为二期评估项。</li>
+</ul>
+<h3 id="2-2-明确不做-边界">2.2 明确不做(边界)</h3>
+<ol>
+<li><strong>不提供论文全文的分发</strong>——只存储与展示元数据、合规获取的摘要、开放获取全文的链接与解析结果(版权边界详见第 16 章)。</li>
+<li><strong>不替代同行评审</strong>——不输出"这篇论文是错的"这类终审结论,只输出可核查的信号(撤稿记录、争议引用、方法学红旗)。</li>
+<li><strong>不做全网爬虫</strong>——数据获取以官方 API 与开放数据集为主,不绕过出版商访问控制。</li>
+<li><strong>不承诺研究机会的可行性</strong>——机会条目一律附带证据强度与风险标注。</li>
+</ol>
+<h3 id="2-3-关键设计约束-对后续技术选型的约束-非选型本身">2.3 关键设计约束(对后续技术选型的约束,非选型本身)</h3>
+<ul>
+<li>所有采集必须支持<strong>增量更新</strong>(按日期游标拉取),这是数据源取舍的硬条件。</li>
+<li>每条结论(评分、趋势判断、空白识别)必须保留<strong>证据链</strong>:来自哪些论文、哪些字段、哪个规则或模型。</li>
+<li>学科参数(评分权重、venue 分级映射、趋势阈值)必须是<strong>配置而非硬编码</strong>,因为学科差异贯穿所有模块。</li>
+</ul>
+<hr />
+<h2 id="3-学术数据源地图">3. 学术数据源地图</h2>
+<blockquote>
+<p>调研时间:2026 年 7 月,以官方文档为准。所有未能从官方页面复核的数字均标注"未核实"。3.1–3.3 为开放/免费数据源;3.4 为商业数据库与出版商 API;3.5 为竞品产品全景。</p>
+</blockquote>
+<h3 id="3-1-开放数据源逐项档案">3.1 开放数据源逐项档案</h3>
+<h4 id="3-1-1-openalex-推荐的多学科主源">3.1.1 OpenAlex —— 推荐的多学科主源</h4>
+<ul>
+<li><strong>地位</strong>:Microsoft Academic Graph(2021 年底停运)的公认继任者,由 OurResearch 于 2022 年 1 月发布,现为开放学术元数据的核心基础设施。</li>
+<li><strong>覆盖</strong>:270M+ works、90M+ 作者、100K+ 来源(sources),全学科。</li>
+<li><strong>API</strong>:<code>api.openalex.org</code>。<strong>2025–2026 重大变化</strong>:文档迁移至 developers.openalex.org,引入免费 API Key + 基于成本(credit)的限流模型——持 key 每天 $1 免费额度(list 查询 $0.0001/次、search $0.001/次、内容下载 $0.01/次、单条查询免费);无 key 每天仅 $0.01。</li>
+<li><strong>付费</strong>:Premium 提供更高限额、月度快照、<strong>每日变更文件</strong>(daily change files——注意:每日增量文件现属付费功能),价格未公开(未核实)。</li>
+<li><strong>数据质量</strong>:引文关系、倒排索引摘要、作者/机构消歧(ORCID、ROR)。许可 <strong>CC0,可商用</strong>。</li>
+<li><strong>增量</strong>:支持按主题/关键词/日期过滤(<code>from_created_date</code>/<code>from_updated_date</code> 参数名以最新官方文档为准)。</li>
+<li><strong>对本系统的含义</strong>:免费额度下做全学科每日增量需要精细预算;或接受月度快照 + 免费 API 补拉的混合模式。</li>
+</ul>
+<h4 id="3-1-2-crossref-doi-权威源">3.1.2 Crossref —— DOI 权威源</h4>
+<ul>
+<li><strong>覆盖</strong>:184,579,686 works(2026-07 实时计数),所有注册 DOI 的出版物。</li>
+<li><strong>API</strong>:<code>api.crossref.org</code>,免注册;<code>mailto=</code> 参数进入礼貌池;速率经响应头动态告知(固定数字未核实)。付费层 Metadata Plus(快照 + SLA)。</li>
+<li><strong>数据质量</strong>:funder、ORCID、ROR、参考文献(取决于会员开放);摘要覆盖不全且部分受出版商版权;作者消歧弱。</li>
+<li><strong>许可</strong>:元数据基本不受版权限制;<strong>部分摘要例外</strong>。</li>
+<li><strong>增量</strong>:<code>from-index-date</code> + cursor 深分页,非常适合增量抓取。</li>
+</ul>
+<h4 id="3-1-3-pubmed-europe-pmc-生物医学双主源">3.1.3 PubMed / Europe PMC —— 生物医学双主源</h4>
+<ul>
+<li><strong>PubMed(NCBI E-utilities)</strong>:40M+ 条记录;免费;无 key 3 req/s、有 key 10 req/s;<strong>每日</strong>更新文件;有 MeSH 主题词;本体无引文数据。增量检索是标杆级的:<code>datetype=edat&amp;reldate=1</code> 即"昨日新收录"。注意:NLM 不主张摘要版权,但出版商/作者可能持有。</li>
+<li><strong>Europe PMC</strong>:48.4M 条,整合 PubMed、PMC、Agricola 及 34 个生命科学预印本服务器;免费 REST API,无需认证;<strong>每日更新</strong>;自带引文网络(smart citations)、ORCID 集成、OA 全文子集;<code>FIRST_PDATE</code> 日期过滤。速率上限官方未明示(未核实)。</li>
+<li><strong>对本系统的含义</strong>:医学/生物方向的监控以这两者为主,PubMed 管"新收录信号",Europe PMC 补引文与全文。</li>
+</ul>
+<h4 id="3-1-4-预印本服务器">3.1.4 预印本服务器</h4>
+<ul>
+<li><strong>arXiv</strong>:2026 年 4 月突破 300 万篇(7 月约 3,099,360);物理/数学/CS 为主。API 免费无认证,但<strong>限速 1 请求/3 秒</strong>、单次 ≤2000 条;OAI-PMH(<code>oaipmh.arxiv.org</code>)与分类 RSS(<code>rss.arxiv.org/rss/&lt;cat&gt;</code>)适合每日监控;公告节奏为周日至周四(美东约 20:00)。<strong>元数据 CC0,全文不得转储再分发</strong>。无引文数据,机构字段质量一般。2025 年起云迁移、正推进成为独立非营利(由 openRxiv 之外的独立进程,细节未核实)。</li>
+<li><strong>bioRxiv / medRxiv</strong>:合计 38.9 万+ 预印本;共用 <code>api.biorxiv.org</code>,免费无认证;<code>details</code> 端点按日期区间 + 游标分页(每次 30 条);<strong>API 无关键词过滤</strong>,需拉回后客户端过滤;许可逐篇(CC BY 至保留所有权利不等)。2025 年 3 月起由独立非营利 <strong>openRxiv</strong> 运营。</li>
+<li><strong>SSRN</strong>:社科工作论文重镇,但 <strong>无官方公开 API</strong>(Elsevier 所有),仅能靠 eJournal RSS 近似监控——社科覆盖的一个结构性缺口,需在报告覆盖声明中显式披露。</li>
+</ul>
+<h4 id="3-1-5-引文与书目专用源">3.1.5 引文与书目专用源</h4>
+<ul>
+<li><strong>OpenCitations</strong>:开放引文基础设施,数据 CC0;REST API 限速 180 req/min;按 DOI/OMID 查引文关系,非发现型检索。用途:为主源交叉补引文。</li>
+<li><strong>Semantic Scholar</strong>:Graph/Recommendations/Datasets 三套 API;提供 TLDR 自动摘要、SPECTER2 论文嵌入、influential citation 标注。<strong>政策收紧(2025–2026)</strong>:持 key 入门仅 1 RPS(人工审核后可提);无 key 共享约 1000 RPS 全局池,高峰降级。数据集许可多为 ODC-BY/带条款,商用需逐条核对(未核实)。定位:小批量富化(嵌入/TLDR/引文),不适合作高频主抓取源。</li>
+<li><strong>DBLP</strong>:CS 书目权威,CC0;搜索 API 免认证 + RSS + 全量 XML 转储;以作者消歧著称;<strong>无摘要、无引文</strong>。用途:CS 方向的 venue/作者规范化与去重基准。</li>
+</ul>
+<h4 id="3-1-6-聚合与目录">3.1.6 聚合与目录</h4>
+<ul>
+<li><strong>CORE</strong>:约 4.31 亿元数据记录(未核实)、数千万自托管全文;API v3 需 key,免费层速率低(约 5 次/10 秒,未核实);数据转储 ODC-BY。harvest 为事件驱动、非每日——<strong>适合建全文语料,不适合当日新刊监控</strong>。</li>
+<li><strong>DOAJ</strong>:OA 期刊目录(约 2.1 万刊,未核实);读 API 免费;无引文。用途:期刊白名单信号之一(注意 DOAJ 除名名单也是预警信号,见第 4 章)。</li>
+<li><strong>The Lens</strong>:200M+ 学术记录 + 大规模专利库;API 需 token,免费限非商业,<strong>商用需付费订阅</strong>(价格未公开);特色是学术↔专利关联,可服务于"产业影响"信号。</li>
+</ul>
+<h4 id="3-1-7-已停运-需替代">3.1.7 已停运/需替代</h4>
+<ul>
+<li><strong>Papers with Code:已停止独立运营</strong>(2026-07 实测 302 重定向到 huggingface.co/papers/trending;由 Meta 于 2025 年前后归档)。"论文↔代码/模型"关联信号改用 <strong>Hugging Face Papers</strong>;历史数据(CC BY-SA)仍可作训练/回填。</li>
+</ul>
+<h3 id="3-2-开放数据源对比总表">3.2 开放数据源对比总表</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>数据源</th>
+<th>规模(2026)</th>
+<th>认证</th>
+<th>速率限制</th>
+<th>费用</th>
+<th>更新</th>
+<th>引文</th>
+<th>摘要</th>
+<th>许可</th>
+<th>日期增量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAlex</td>
+<td>270M+</td>
+<td>key(免费)</td>
+<td>$1/天成本额度</td>
+<td>免费/Premium</td>
+<td>持续(日增量=付费)</td>
+<td>✔</td>
+<td>倒排</td>
+<td>CC0</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Crossref</td>
+<td>184.6M</td>
+<td>无</td>
+<td>动态</td>
+<td>免费/Plus</td>
+<td>实时</td>
+<td>部分</td>
+<td>部分</td>
+<td>基本无限制</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>PubMed</td>
+<td>40M+</td>
+<td>可选 key</td>
+<td>3–10 req/s</td>
+<td>免费</td>
+<td>每日</td>
+<td>✘</td>
+<td>✔</td>
+<td>公共领域*</td>
+<td>✔(edat)</td>
+</tr>
+<tr>
+<td>Europe PMC</td>
+<td>48.4M</td>
+<td>无</td>
+<td>未核实</td>
+<td>免费</td>
+<td>每日</td>
+<td>✔</td>
+<td>✔</td>
+<td>逐条</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>arXiv</td>
+<td>3.1M</td>
+<td>无</td>
+<td>1 req/3s</td>
+<td>免费</td>
+<td>每日(日–四)</td>
+<td>✘</td>
+<td>✔</td>
+<td>元数据 CC0</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>bioRxiv/medRxiv</td>
+<td>38.9 万</td>
+<td>无</td>
+<td>30 条/页</td>
+<td>免费</td>
+<td>持续</td>
+<td>✘</td>
+<td>✔</td>
+<td>逐篇 CC</td>
+<td>✔(无关键词过滤)</td>
+</tr>
+<tr>
+<td>Semantic Scholar</td>
+<td>数亿</td>
+<td>key(1 RPS)</td>
+<td>收紧中</td>
+<td>免费</td>
+<td>快照</td>
+<td>✔</td>
+<td>✔+TLDR</td>
+<td>ODC-BY/协议</td>
+<td>✔(bulk)</td>
+</tr>
+<tr>
+<td>OpenCitations</td>
+<td>数十亿引文</td>
+<td>可选 token</td>
+<td>180/min</td>
+<td>免费</td>
+<td>周期</td>
+<td>核心</td>
+<td>✘</td>
+<td>CC0</td>
+<td>✘(按 ID)</td>
+</tr>
+<tr>
+<td>DBLP</td>
+<td>~700 万</td>
+<td>无</td>
+<td>未核实</td>
+<td>免费</td>
+<td>RSS/转储</td>
+<td>✘</td>
+<td>✘</td>
+<td>CC0</td>
+<td>弱</td>
+</tr>
+<tr>
+<td>CORE</td>
+<td>~431M</td>
+<td>key</td>
+<td>~5/10s</td>
+<td>免费/付费</td>
+<td>事件驱动</td>
+<td>弱</td>
+<td>✔</td>
+<td>ODC-BY</td>
+<td>未核实</td>
+</tr>
+<tr>
+<td>DOAJ</td>
+<td>~11M 文章</td>
+<td>读免</td>
+<td>未核实</td>
+<td>免费</td>
+<td>持续</td>
+<td>✘</td>
+<td>✔</td>
+<td>CC0(待核)</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>The Lens</td>
+<td>200M+</td>
+<td>token</td>
+<td>按订阅</td>
+<td>免费/商用付费</td>
+<td>定期</td>
+<td>✔</td>
+<td>✔</td>
+<td>商用受限</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>SSRN</td>
+<td>~130 万</td>
+<td>无 API</td>
+<td>—</td>
+<td>免费读</td>
+<td>持续</td>
+<td>✘</td>
+<td>✔</td>
+<td>Elsevier 条款</td>
+<td>仅 RSS</td>
+</tr>
+<tr>
+<td>Papers with Code</td>
+<td>已停运</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>→HF Papers</td>
+</tr>
+</tbody>
+</table></div>
+<p>* PubMed 摘要:NLM 不主张版权,但出版商/作者可能持有,再分发需谨慎(见第 16 章)。</p>
+<h3 id="3-3-持续监控的推荐源组合-开放部分">3.3 持续监控的推荐源组合(开放部分)</h3>
+<ul>
+<li><strong>多学科主干</strong>:OpenAlex(元数据 + 引文 + 消歧)⊕ Crossref(DOI 权威 + 增量索引)——以 DOI + OpenAlex ID 为主键跨源去重。</li>
+<li><strong>生物医学</strong>:PubMed(每日新收录)⊕ Europe PMC(引文/全文/预印本聚合)⊕ bioRxiv/medRxiv(预印本)。</li>
+<li><strong>CS / 数学 / 物理</strong>:arXiv(每日 RSS + OAI-PMH)⊕ DBLP(venue/作者规范化)⊕ Hugging Face Papers(代码模型关联)。</li>
+<li><strong>富化层</strong>:Semantic Scholar(TLDR/嵌入/influential citations,低速批量)⊕ OpenCitations(引文交叉验证)。</li>
+<li><strong>已知缺口</strong>:SSRN 无 API(社科工作论文监控受限);OpenAlex 每日变更文件付费;人文学科覆盖普遍薄弱。这些缺口写入报告"覆盖声明"。</li>
+</ul>
+<h3 id="3-4-商业数据库-出版商-api-与发现工具">3.4 商业数据库、出版商 API 与发现工具</h3>
+<blockquote>
+<p>调研时间:2026-07-17,配额/条款数字来自官方页面实测;官方原文抓取失败的项标注"未核实"。若干出版商站点对自动化访问直接返回 403(science.org、cell.com、onlinelibrary.wiley.com、scite 定价页),这本身即是其反爬立场的证据。</p>
+</blockquote>
+<h4 id="3-4-1-商业索引库">3.4.1 商业索引库</h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>源</th>
+<th>API</th>
+<th>获取条件</th>
+<th>关键配额/条款(官方实测)</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Google Scholar</strong></td>
+<td><strong>无官方 API</strong></td>
+<td>—</td>
+<td>robots.txt 明确 <code>Disallow: /scholar</code>;高频访问触发验证码/封 IP</td>
+<td><strong>不可直接抓取</strong>。必须要 Scholar 独有信号时走第三方 SerpApi($25/月 1000 次 ~ $275/月 3 万次,含法律责任转移条款)</td>
+</tr>
+<tr>
+<td><strong>Scopus</strong>(Elsevier)</td>
+<td>有</td>
+<td>key 个人可注册,<strong>完整权益绑定机构订阅</strong>(IP 校验)</td>
+<td>Search 2 万次/周、9 req/s;摘要<strong>禁止公开展示</strong>;应用须非商用无广告,商用需商务协议</td>
+<td>机构有订阅时是引文数据一线选择;摘要不可二次分发</td>
+</tr>
+<tr>
+<td><strong>Web of Science</strong>(Clarivate)</td>
+<td>有(Starter/Expanded/Journals 等)</td>
+<td>Starter 有免费试用层;生产需机构订阅</td>
+<td>免费层 50 次/天、1 req/s、<strong>不含被引数</strong>;机构层 5 千–2 万次/天</td>
+<td>免费层仅够原型;权威但门槛与成本最高</td>
+</tr>
+<tr>
+<td><strong>Dimensions</strong>(Digital Science)</td>
+<td>有(DSL API + BigQuery 版)</td>
+<td>机构订阅;科研免费通道需申请</td>
+<td>条款明文:API "<strong>not intended</strong> for bulk data or to power…derivative products"</td>
+<td><strong>禁止驱动衍生产品条款与本系统定位直接冲突</strong>,不可作数据底座</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="3-4-2-出版商平台">3.4.2 出版商平台</h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>源</th>
+<th>通道</th>
+<th>关键限制(官方实测)</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Springer Nature</strong></td>
+<td>Meta API(全部 SN 元数据+摘要,含 Nature 系)、OA API、TDM 全文 API</td>
+<td>个人可注册,Basic 免费;具体配额需登录核实(未核实)</td>
+<td><strong>对个人开发者最友好的出版商 API</strong>;Nature 系元数据合规通道</td>
+</tr>
+<tr>
+<td><strong>Nature RSS</strong></td>
+<td><code>nature.com/&lt;journal&gt;.rss</code></td>
+<td>实测可用(2026-07),对自动化友好</td>
+<td>顶刊动态监控直接用</td>
+</tr>
+<tr>
+<td><strong>Elsevier ScienceDirect</strong></td>
+<td>Search v2 / Article Retrieval(TDM key 不限量)</td>
+<td>Search 2 万次/周;全文 TDM 限订阅机构、非商用;<strong>含 Cell Press</strong></td>
+<td>与 Scopus 共享一次商务关系,机构订阅下边际成本低</td>
+</tr>
+<tr>
+<td><strong>Wiley TDM API</strong></td>
+<td>click-through 许可 + token</td>
+<td>机构订阅、非商用、3 req/s、登记 IP;网站直接抓取 403</td>
+<td>只解决全文挖掘;元数据走 Crossref</td>
+</tr>
+<tr>
+<td><strong>IEEE Xplore API</strong></td>
+<td>Metadata Search 等</td>
+<td>约 200 次/天(未核实官方原文);<strong>禁存储、禁再分发、禁商用、明文禁止用于训练 AI/ML</strong></td>
+<td>只能作即时查询补充,<strong>不能做持久化索引</strong></td>
+</tr>
+<tr>
+<td><strong>ACM DL</strong></td>
+<td><strong>无公开 API</strong></td>
+<td>robots.txt 禁搜索路径、明确封禁 GPTBot/CCBot 等 AI 爬虫</td>
+<td>不要抓;ACM 论文走 Crossref + DBLP 全覆盖</td>
+</tr>
+<tr>
+<td><strong>Science (AAAS)</strong></td>
+<td>RSS/API 均未核实</td>
+<td>science.org 全面 403</td>
+<td>经 Crossref + PubMed 间接追踪</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="3-4-3-发现-可视化工具-竞品分析">3.4.3 发现/可视化工具(竞品分析)</h4>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Connected Papers</th>
+<th>ResearchRabbit</th>
+<th>Litmaps</th>
+<th>Scite.ai</th>
+<th>Elicit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>核心功能</td>
+<td>单篇→相似度图谱</td>
+<td>集合式推荐+作者网络+邮件提醒</td>
+<td>引文地图+持续监测</td>
+<td>引用上下文分类(支持/反驳)</td>
+<td>AI 综述与数据提取</td>
+</tr>
+<tr>
+<td>数据源</td>
+<td>Semantic Scholar</td>
+<td>SS+OpenAlex+Crossref(310M+)</td>
+<td>SS+OpenAlex+Crossref(270M+)</td>
+<td><strong>自建 Smart Citations(1.3B+ 引用陈述,出版商协议)</strong></td>
+<td>138M+ 论文(底层未核实)</td>
+</tr>
+<tr>
+<td>免费层</td>
+<td>5 图/月(未核实)</td>
+<td>全免费</td>
+<td>2 图、月度提醒</td>
+<td>试用</td>
+<td>Basic 免费</td>
+</tr>
+<tr>
+<td>付费</td>
+<td>~$3/月(未核实)</td>
+<td>无个人付费</td>
+<td>$10/月</td>
+<td>~$20/月(未核实)</td>
+<td>$49–169/月</td>
+</tr>
+<tr>
+<td>公开 API</td>
+<td>无</td>
+<td>无</td>
+<td>无</td>
+<td><strong>有(商用需单独许可)</strong></td>
+<td><strong>有(Pro+ 含)</strong></td>
+</tr>
+<tr>
+<td>对本系统</td>
+<td>竞品参考(图谱 UX)</td>
+<td><strong>最直接竞品</strong>(追踪工作流)</td>
+<td>竞品参考(付费模式基准)</td>
+<td><strong>可集成组件</strong>+竞品</td>
+<td>可集成组件(功能正交)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>竞品洞察</strong>:五家工具中四家是把 Semantic Scholar / OpenAlex / Crossref 的免费数据包装成产品,真正拥有独家数据资产的只有 scite(引用上下文)。这印证了本系统的路线:<strong>免费开放 API 做数据底座 + 少量商业源做增值层,把投入集中在"持续追踪 + 报告生成"的工作流体验上</strong>——这正是 ResearchRabbit 免费但浅、Litmaps 收 $10/月 的空档,而"自动周报/月报 + 研究空白识别"是五家都没有做深的能力。</p>
+<h4 id="3-4-4-商业源接入决策清单">3.4.4 商业源接入决策清单</h4>
+<p><strong>值得接入(按优先级)</strong>:① Springer Nature API + Nature RSS(注册即可起步);② Scopus + ScienceDirect(前提:机构订阅;对外服务需商务协议);③ Wiley TDM(仅当需要其全文);④ WoS(仅生产级预算下);⑤ SerpApi(仅当必须要 Scholar 引用信号);组件:scite API(需商业许可)。</p>
+<p><strong>明确避免</strong>:直接抓取 Google Scholar / ACM / Science / Cell / Wiley 网页(robots.txt 或 WAF 明确拒绝,且元数据均可从 Crossref 免费合规获得);IEEE API 用于持久化索引;Dimensions 作数据底座;公开界面展示 Scopus 摘要。</p>
+<h3 id="3-5-学术情报-论文推送产品全景-竞品分析-2026-07-核实">3.5 学术情报/论文推送产品全景(竞品分析,2026-07 核实)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>产品</th>
+<th>核心定位</th>
+<th>推荐/排序机制</th>
+<th>交付形式</th>
+<th>覆盖</th>
+<th>定价</th>
+<th>明显短板</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scholar Inbox</td>
+<td>个性化推送</td>
+<td>80 万+ 用户评分训练 + 主动学习</td>
+<td>邮件 digest + feed</td>
+<td>CS/arXiv 为主</td>
+<td>免费</td>
+<td>生医/社科弱</td>
+</tr>
+<tr>
+<td>arXiv Sanity Lite</td>
+<td>论文过滤</td>
+<td>TF-IDF + SVM</td>
+<td>web</td>
+<td>arXiv</td>
+<td>开源</td>
+<td><strong>原域名已易主,实质废弃</strong></td>
+</tr>
+<tr>
+<td>S2 Research Feeds</td>
+<td>个性化推送</td>
+<td>相关/不相关标注训练</td>
+<td>feed + TLDR</td>
+<td>全学科 2 亿+</td>
+<td>免费</td>
+<td>无深度报告</td>
+</tr>
+<tr>
+<td>Google Scholar Alerts</td>
+<td>关键词/引用提醒</td>
+<td>关键词匹配,无排序</td>
+<td>邮件</td>
+<td>全学科最广</td>
+<td>免费</td>
+<td>无摘要无排序,噪声大;<strong>新动向:Scholar Labs AI 搜索(2025-11 发布)</strong></td>
+</tr>
+<tr>
+<td>Stork 文献鸟</td>
+<td>监控+写作全家桶</td>
+<td>关键词/期刊监控</td>
+<td>邮件</td>
+<td>全学科(生医强)</td>
+<td>免费+Pro</td>
+<td>个性化弱、功能杂</td>
+</tr>
+<tr>
+<td>Zeta Alpha</td>
+<td>企业 R&amp;D 情报</td>
+<td>神经搜索 + RAG</td>
+<td>企业平台</td>
+<td>企业定制</td>
+<td>企业订阅</td>
+<td>非个人产品</td>
+</tr>
+<tr>
+<td>Undermind</td>
+<td>agentic 深度检索</td>
+<td>LLM 系统性检索代理</td>
+<td>检索会话报告</td>
+<td>全学科</td>
+<td>Pro $16/月</td>
+<td>非持续监控</td>
+</tr>
+<tr>
+<td>Emergent Mind</td>
+<td>社交热度聚合</td>
+<td>X/Reddit/GitHub 热度</td>
+<td>web+邮件+视频</td>
+<td>AI/CS</td>
+<td>免费+付费</td>
+<td>流行度偏差</td>
+</tr>
+<tr>
+<td>SciSpace</td>
+<td>AI 综述/问答</td>
+<td>语义检索 + LLM</td>
+<td>综述报告</td>
+<td>全学科</td>
+<td>~$12/月(部分核实)</td>
+<td>摘要质量争议</td>
+</tr>
+<tr>
+<td>Consensus</td>
+<td>实证问答</td>
+<td>语义检索 + 共识条</td>
+<td>问答</td>
+<td>生医强</td>
+<td>~$9–12/月(部分核实)</td>
+<td>仅擅长"是否"型问题</td>
+</tr>
+<tr>
+<td>Elicit</td>
+<td>系统综述自动化</td>
+<td>语义检索 + 数据提取</td>
+<td>表格+Reports+alerts</td>
+<td>生医/实证强</td>
+<td>Pro $49/月</td>
+<td>贵、偏实证</td>
+</tr>
+<tr>
+<td>Litmaps</td>
+<td>引文图谱+监控</td>
+<td>引文网络</td>
+<td>图谱+告警</td>
+<td>全学科</td>
+<td>Pro $10/月</td>
+<td>新论文覆盖有限</td>
+</tr>
+<tr>
+<td>ResearchRabbit</td>
+<td>引文网络探索</td>
+<td>引文网络</td>
+<td>图谱+Zotero</td>
+<td>310M+</td>
+<td>免费</td>
+<td>无评分无摘要</td>
+</tr>
+<tr>
+<td>Paper Digest</td>
+<td>多源日报</td>
+<td>关键词+知识图谱,句句附引用防幻觉</td>
+<td>邮件日报</td>
+<td>跨学科最全</td>
+<td>未公开</td>
+<td>摘要较浅</td>
+</tr>
+<tr>
+<td>Ai2 Asta / FutureHouse</td>
+<td>科研 agent 生态</td>
+<td>agent + S2 / 生物学专用</td>
+<td>agent 对话</td>
+<td>全学科/生物</td>
+<td>未定价</td>
+<td>新、稳定性未知</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>六个差异化机会(竞品共同空白)</strong>:
+1. <strong>可信度 + 可复现性显式多维评分</strong>——现有产品要么按相关性推荐、要么按热度,没有一家做可解释的多维评分,这是最大蓝海;
+2. <strong>撤稿/PubPeer/statcheck/SciScore 信号无人整合进推送流</strong>——而 Retraction Watch 已免费、接入成本低;
+3. <strong>开放 altmetrics 管道</strong>:X API 收费后,自建 Bluesky(AT Protocol 免费 firehose)+ 新闻 + Overton 政策引用,绕开 Altmetric/PlumX 付费墙;
+4. <strong>代码/数据可用性自动检测</strong>——Papers with Code 关停留下的空缺;
+5. <strong>冷启动影响力预测</strong>:题目+摘要 LLM 预测分,做"值得早读"榜(竞品要么等引用、要么看热度);
+6. <strong>可解释、抗操纵的 LLM 评估</strong>:借鉴 AAAI-26/ICLR-25 试点规范(明确标识、不做否决、防注入)。</p>
+<p>叠加 3.4.3 的观察,本系统定位:<strong>个性化推送 + 六维显式评分 + 自动周报月报 + 研究空白识别</strong>——15 款竞品无一同时具备。</p>
+<hr />
+<h2 id="4-顶级期刊与会议识别方法">4. 顶级期刊与会议识别方法</h2>
+<blockquote>
+<p>调研时间:2026-07,以官方来源为准。本章两项最重要的时效性发现:<strong>① 中科院分区表已于 2026-03-27 官宣停更(2025 年度为最后一版);② CCF 第七版目录(2026-03-05)与 ICORE2026 均为 2026 年新发布</strong>——任何依赖这些目录的系统必须立即更新数据依赖。</p>
+</blockquote>
+<h3 id="4-1-核心指标核查表">4.1 核心指标核查表</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>计算方式</th>
+<th>数据源</th>
+<th>获取</th>
+<th>主要批评</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JIF</strong>(Clarivate JCR)</td>
+<td>前 2 年文献在当年获引 ÷ 前 2 年可引用条目数。2023 年起覆盖扩至 ESCI/AHCI、改为一位小数</td>
+<td>WoS 核心合集</td>
+<td>订阅制,无免费 API;2026 版覆盖 22,643 种期刊</td>
+<td>引用分布高度右偏(Nature 的 IF 约 90% 来自 1/4 论文);可操纵(多个 JCR 除名案例);学科不可比</td>
+</tr>
+<tr>
+<td><strong>CiteScore</strong>(Elsevier)</td>
+<td>4 年窗口,分子分母文档类型一致(堵住 JIF 的操纵点)</td>
+<td>Scopus</td>
+<td><strong>免费</strong>浏览;Tracker 每月更新</td>
+<td>综述刊占优;发布者即最大出版商的利益冲突之争</td>
+</tr>
+<tr>
+<td><strong>SJR</strong>(SCImago)</td>
+<td>PageRank 类声望指标,3 年窗</td>
+<td>Scopus</td>
+<td><strong>免费,全量 CSV 可下载</strong></td>
+<td>算法透明度低;Scopus 覆盖偏差</td>
+</tr>
+<tr>
+<td><strong>SNIP</strong>(CWTS)</td>
+<td>按引用来源领域引用密度规范化,跨学科可比</td>
+<td>Scopus</td>
+<td>免费(journalindicators.com)</td>
+<td>逻辑不直观</td>
+</tr>
+<tr>
+<td><strong>h-index / h5</strong>(GS Metrics)</td>
+<td>h5 仅统计近 5 个完整年</td>
+<td>Google Scholar</td>
+<td>免费网页,<strong>无 API 无批量下载</strong></td>
+<td>与发文规模强相关;GS 索引噪音;但对 CS 会议覆盖是独特价值</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>分区体系对比与变局</strong>:</p>
+<ul>
+<li><strong>JCR 分区</strong>:每个学科类别内按 JIF 四等分(Q1 前 25%…)。持续更新,订阅制。</li>
+<li><strong>中科院分区表</strong>:金字塔形(1 区约前 5%),升级版以"期刊超越指数"取代三年平均 IF;2025 年度覆盖 21,772 种期刊。<strong>关键事件:中科院文献情报中心 2026-03-27 官方声明自 2026 年起停更</strong>(来源:las.cas.cn 官方声明);已有高校宣布暂按 2025 年度表认定。→ 系统必须将其作为<strong>冻结快照</strong>使用并标注 <code>frozen_2025, discontinued</code>,长期迁移到 JCR/SJR/OpenAlex 指标。</li>
+</ul>
+<h3 id="4-2-会议分级体系">4.2 会议分级体系</h3>
+<ul>
+<li><strong>ICORE(原 CORE)</strong>:门户 portal.core.edu.au,最新轮次 <strong>ICORE2026</strong>。等级:A*(旗舰,约 7.5%)/ A(约 13.1%)/ B(约 30.2%)/ C(约 46.2%)。评审混合指标:引用率、录取率、委员会声望。免费查询,无官方 API(未核实)。</li>
+<li><strong>CCF 推荐目录</strong>:<strong>第七版,2026-03-05 发布</strong>(上一版为 2022 第六版);A/B/C 三级 × 10 个领域,仅认长文。官方只发 PDF;社区结构化数据用 <strong>ccfddl/ccf-deadlines</strong>(GitHub,YAML 含 CCF/CORE/TH-CPL 等级 + DBLP id;注意其标注基于 2022 版,第七版同步情况未核实)。</li>
+<li>其他:挪威注册(Level 0/1/2,CC BY 开放)、芬兰 JUFO(0–3 级,有 API,未核实);澳 ERA 已停办(未核实)。</li>
+</ul>
+<h3 id="4-3-掠夺性期刊识别">4.3 掠夺性期刊识别</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>来源</th>
+<th>现状</th>
+<th>用法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Beall's List</td>
+<td>原表 2017 年下线;beallslist.net 为匿名维护的存档增补版</td>
+<td>红旗信号之一,不单独定性</td>
+</tr>
+<tr>
+<td>Cabells Predatory Reports</td>
+<td>付费;74 项行为指标(v1.1)</td>
+<td>有预算时的权威红旗源</td>
+</tr>
+<tr>
+<td>Think. Check. Submit.</td>
+<td>COPE/DOAJ/OASPA 等十机构联合免费清单(CC BY)</td>
+<td>转化为白名单检查项</td>
+</tr>
+<tr>
+<td>DOAJ 除名名单</td>
+<td>公开电子表格(含除名原因)</td>
+<td><strong>以不当行为除名 = 强红旗</strong></td>
+</tr>
+<tr>
+<td>中科院预警名单</td>
+<td>2025 版仅 5 本;分区停更后是否延续未核实</td>
+<td>一票否决信号</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>自动化识别策略</strong>:白名单信号(in DOAJ / 出版商为 COPE/OASPA 成员 / Scopus/WoS/MEDLINE 收录)降风险;红旗信号(预警名单命中、山寨影响因子、年发文量同比暴增 &gt;300%——OpenAlex <code>counts_by_year</code> 可检测、ISSN 不可验证、DOAJ 不当行为除名)升风险。纯 ML 识别生产可用性有限,<strong>以规则 + 人工复核为主</strong>。</p>
+<h3 id="4-4-学科差异的证据链">4.4 学科差异的证据链</h3>
+<ul>
+<li><strong>CS 重会议</strong>:CSRankings 官方 FAQ 明确只按顶会发表计量、拒绝引用指标("repeatedly shown to be subject to manipulation")与声誉问卷;数据源 DBLP,全开源。</li>
+<li><strong>医学/生物重期刊</strong>:McKiernan et al. 2019(eLife, DOI:10.7554/eLife.47338)对 864 份北美晋升文件的分析:40% 研究型大学提及 JIF,其中 87% 为支持性使用——期刊指标在生医评价中根深蒂固(DORA 也正诞生于细胞生物学界)。</li>
+<li><strong>数学重长期影响</strong>:IMU/ICIAM/IMS《Citation Statistics》(DOI:10.1214/09-STS285):"相信引用统计因简单客观而优于同行评审,这种信念没有根据";数学引用半衰期长,应弱化 2 年窗指标。</li>
+<li><strong>社科人文</strong>:英国 REF 以 outputs + 学术界之外的 impact + environment 三要素评估,政策影响以案例研究承载;WoS/Scopus 对社科人文、非英语文献、专著覆盖系统性不足(Mongeon &amp; Paul-Hus 2016,未直接核实原文)。</li>
+<li><strong>定量根据</strong>:数理科学两年内引用仅占 1–3%,生物科学 5–8% → <strong>跨学科比较必须在学科类别内取百分位,禁止直接比较原始 IF/引用数</strong>。</li>
+</ul>
+<h3 id="4-5-可机读分级数据源">4.5 可机读分级数据源</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>数据源</th>
+<th>关键字段</th>
+<th>免费</th>
+<th>更新</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OpenAlex sources</strong></td>
+<td><code>2yr_mean_citedness</code>(类 IF)、<code>h_index</code>、<code>works_count</code>、<code>counts_by_year</code>、<code>is_in_doaj</code>、<code>is_core</code>、<code>type</code>、<code>topics</code>、APC 信息</td>
+<td>✔(API key 限额内)</td>
+<td>持续</td>
+</tr>
+<tr>
+<td><strong>SCImago 年度 CSV</strong></td>
+<td>SJR、Quartile、H index</td>
+<td>✔</td>
+<td>每年</td>
+</tr>
+<tr>
+<td><strong>Scopus 来源列表</strong></td>
+<td>期刊/会议清单、停刊名单</td>
+<td>✔(Excel)</td>
+<td>每月</td>
+</tr>
+<tr>
+<td><strong>CCF(经 ccfddl YAML)</strong></td>
+<td>A/B/C + CORE + TH-CPL 等级</td>
+<td>✔</td>
+<td>随社区</td>
+</tr>
+<tr>
+<td><strong>ICORE 门户</strong></td>
+<td>A*/A/B/C</td>
+<td>✔(查询)</td>
+<td>不定期</td>
+</tr>
+<tr>
+<td><strong>DOAJ</strong></td>
+<td>白名单 + 除名表</td>
+<td>✔</td>
+<td>持续</td>
+</tr>
+<tr>
+<td><strong>JCR</strong></td>
+<td>JIF、JCI、Q 分区</td>
+<td>✘(订阅)</td>
+<td>每年 6 月</td>
+</tr>
+<tr>
+<td><strong>中科院分区</strong></td>
+<td>大类/小类、Top、预警</td>
+<td>部分</td>
+<td><strong>已终止(冻结 2025)</strong></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="5-跨学科学术质量评价框架">5. 跨学科学术质量评价框架</h2>
+<h3 id="5-1-负责任科研评价的合规约束-框架的-宪法">5.1 负责任科研评价的合规约束(框架的"宪法")</h3>
+<ul>
+<li><strong>DORA(2012,27,259 个签署方)</strong>:第 1 条——不得以期刊指标(如 JIF)作为单篇论文质量或个人贡献的替代度量。</li>
+<li><strong>Leiden Manifesto(Nature 2015, DOI:10.1038/520429a)</strong>:10 条原则,对本系统最关键的是:#4 数据与分析过程公开透明简单、#5 允许被评者核对、#6 按学科规范化、#8 避免虚假精确、#10 定期重审指标。</li>
+<li><strong>CoARA(2022,800+ 组织)</strong>:承诺 3——放弃期刊/出版物指标(点名 JIF、h-index)在科研评价中的不当使用。</li>
+</ul>
+<p><strong>落地为六条系统规则</strong>:① 分级仅用于"投稿目标筛选 / 情报聚合",禁止换算为个人绩效;② 多指标并列展示原始值,不造单一黑箱总分;③ 一切引用指标只在学科内取百分位;④ 判定规则与数据快照公开可复核、可申诉;⑤ 分级边界 ±2 百分点内标"边界案例"转人工;⑥ 年度重审阈值,公开 changelog(警惕 Goodhart 效应)。</p>
+<h3 id="5-2-五级分级框架-s-a-b-普通-预警-判定规则">5.2 五级分级框架(S / A / B / 普通 / 预警)判定规则</h3>
+<p>规则<strong>自上而下短路执行</strong>;每个判定输出 <code>级别 + 触发规则 ID + 原始指标值 + 数据快照日期</code>。</p>
+<p><strong>第 0 步 · 预警级(一票否决)</strong>——命中任一:中科院预警名单(2025 冻结版)或当年 JCR suppression;DOAJ 以不当行为除名 / Cabells 收录 / Beall 存档命中且无白名单对冲;自动红旗组合 ≥2 项(发文量同比 &gt;300% 且 &gt;2000 篇、虚假影响因子、ISSN 不可验证、OA 刊不在 DOAJ 且出版商非 COPE/OASPA 成员);被劫持期刊名单命中。→ 输出理由码,允许申诉。</p>
+<p><strong>S 级(旗舰,学科前 ~2–5%)</strong>——"分区/评级"与"独立佐证"各至少 1 项且无红旗:
+- 期刊:JCR Q1 且 JIF 学科百分位 ≥95(无 JCR 时:SCImago Q1 且 SJR 百分位 ≥95);
+- 会议:CCF-A 或 ICORE A*;
+- 独立佐证:OpenAlex <code>2yr_mean_citedness</code> 学科百分位 ≥90,或 <code>h_index</code> 学科前 5%,或 GS Metrics 领域榜前 20。</p>
+<p><strong>A 级(优秀,前 ~5–20%)</strong>:期刊 Q1 未达 S 佐证或百分位 80–95;会议 CCF-B 或 ICORE A;OpenAlex 百分位 ≥75 佐证;无红旗。</p>
+<p><strong>B 级(良好,前 ~20–50%)</strong>:期刊 Q2 或百分位 50–80;会议 CCF-C 或 ICORE B;白名单信号完备。</p>
+<p><strong>普通级(正规但无突出信号)</strong>:Scopus/WoS/DOAJ 任一正规收录(或挪威 Level 1)、同行评审可验证,但指标处于学科后 50% 或数据不足。<strong>数据不足 ≠ 预警</strong>——保护新刊、区域刊与本地相关研究(Leiden #3)。</p>
+<h3 id="5-3-学科调整规则">5.3 学科调整规则</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>学科</th>
+<th>调整</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>计算机</td>
+<td>会议评级优先于一切期刊指标;CCF-A / ICORE A* 直接进 S 候选,引用指标仅作佐证;LNCS 会议论文集不按期刊处理</td>
+</tr>
+<tr>
+<td>医学/生物</td>
+<td>期刊路径为主;临床期刊须 MEDLINE 收录才可 ≥B;预印本平台单列不分级</td>
+</tr>
+<tr>
+<td>数学</td>
+<td>淡化 2 年窗指标,改用 SJR / h_index 长窗信号;S 级放宽至学科前 8%;叠加 zbMATH/MathSciNet 收录白名单(接口未核实)</td>
+</tr>
+<tr>
+<td>社科人文</td>
+<td>不因"无 JIF / 低引用"降到普通以下;专著出版社按挪威 Level 2/1 分级;非英语正规期刊按 ERIH PLUS / 挪威注册认定;政策影响仅人工加注,不进自动分级</td>
+</tr>
+<tr>
+<td>交叉学科</td>
+<td>取多学科百分位<strong>最高值</strong>定级,避免目录体系对交叉领域的系统性低估</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="5-4-运维节奏">5.4 运维节奏</h3>
+<p>每年 6–7 月(JCR / GS Metrics 发布后)与 SCImago 年度发布后各刷新一次;OpenAlex 月度监测发文量异动;中科院分区字段永久标注 <code>frozen_2025, discontinued_2026-03-27</code>;年度回顾阈值并公开 changelog,设申诉通道。</p>
+<hr />
+<h2 id="6-论文重要性评分模型">6. 论文重要性评分模型</h2>
+<blockquote>
+<p>调研时间:2026-07。本章先给证据基础(6.1–6.4),再给评分模型(6.5–6.6)。</p>
+</blockquote>
+<h3 id="6-1-早期影响力预测-哪些特征真的有预测力">6.1 早期影响力预测:哪些特征真的有预测力</h3>
+<p>跨研究共识的特征强度排序(用于特征工程):<strong>头 1–2 年早期引用轨迹 &gt; venue 声望 &gt; 作者既往被引记录 &gt; 机构 &gt; 参考文献特征 &gt; 社交媒体信号</strong>。</p>
+<ul>
+<li>经典结果:内容特征 + 文献计量特征混合显著优于单一特征(Fu &amp; Aliferis 2010);40+ 特征的非线性模型可较准确预测 10 年引用(Weihs &amp; Etzioni, JCDL 2017)。</li>
+<li><strong>LLM 时代的关键进展</strong>:仅用题目 + 摘要微调 LLM 预测归一化影响力,NDCG@20=0.901(Zhao et al., AAAI 2025, arXiv:2408.03934)——<strong>解决"零引用冷启动"问题</strong>,新论文发表当天即可打前瞻影响力分。</li>
+<li>Altmetrics 与最终引用的相关性总体弱到中等;其中<strong>新闻/政策提及强于社交媒体提及</strong>(部分未核实,方向可信)。</li>
+</ul>
+<h3 id="6-2-信号源现状-2026-07-核实">6.2 信号源现状(2026-07 核实)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>信号</th>
+<th>现状</th>
+<th>获取</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>撤稿数据</strong></td>
+<td><strong>Retraction Watch 数据库已完全免费开放</strong>(2023-09 被 Crossref 收购):CSV 下载 + GitLab 仓库 + Labs API;OpenAlex 亦有 <code>is_retracted</code></td>
+<td>免费,系统必须每日同步</td>
+</tr>
+<tr>
+<td>引文语境</td>
+<td>scite Smart Citations(supporting/mentioning/contrasting,8 亿+ 引用陈述;API 需商业许可);Semantic Scholar <code>influentialCitationCount</code> 免费(依赖施引全文可得性)</td>
+<td>scite 付费 / S2 免费</td>
+</tr>
+<tr>
+<td>Altmetrics</td>
+<td><strong>Crossref Event Data 已于 2026-04-23 关停,不要依赖</strong>;Altmetric.com 继续采 X(经 API v2)并<strong>首家系统追踪 Bluesky</strong>(2024-12 起);PlumX 随 Elsevier 订阅</td>
+<td>商业授权;<strong>自建替代:Bluesky AT Protocol firehose 免费 + Overton 政策引用(订阅)</strong></td>
+</tr>
+<tr>
+<td>方法学严谨度</td>
+<td>SciScore(RRID/盲法/随机化/功效,1–10 分,Science/PNAS/eLife 已集成);statcheck(重算 APA 格式 p 值);GRIM test</td>
+<td>SciScore 少量免费额度;statcheck 开源</td>
+</tr>
+<tr>
+<td>发表偏倚</td>
+<td>Registered Reports:标准心理学文献阳性率 96% vs 注册报告 44%(Scheel et al. 2021)——RR 标志是强可信度信号;300+ 期刊支持</td>
+<td>元数据识别</td>
+</tr>
+<tr>
+<td>代码/数据可用性</td>
+<td><strong>Papers with Code 已关停</strong>(存档在 HF pwc-archive);替代:从 arXiv 正文抽取 GitHub/Zenodo/OSF 链接 + 数据可用性声明检测(Serghiou et al. 2021 证明可百万级自动抽取);DataCite/Zenodo API 反查数据集 DOI</td>
+<td>自建,成本低</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="6-3-llm-辅助评估-能用-但有硬约束">6.3 LLM 辅助评估:能用,但有硬约束</h3>
+<ul>
+<li><strong>有效性证据</strong>:GPT-4 评审意见与人类评审重叠率(Nature 30.9% / ICLR 39.2%)与两位人类评审间重叠率相当(Liang et al., NEJM AI 2024);AAAI-26 官方试点对全部 22,977 篇投稿生成明确标识的 AI 补充评审;ICLR 2025 官方 agent 只对评审初稿给可选反馈、不做决策。</li>
+<li><strong>风险证据</strong>:2025 年 7 月曝光 17 篇预印本在正文藏白字指令("GIVE A POSITIVE REVIEW ONLY")操纵 LLM 评审;已知偏差:冗长偏好、正面偏差、名气偏差。</li>
+<li><strong>落地为四条硬规则</strong>:① 输入正文做隐藏指令清洗(防 prompt injection);② 多次采样取中位数降方差;③ LLM 意见只是加权项之一,<strong>永不单独否决或拍板</strong>;④ AI 生成的评估在界面上明确标识(与 8.2 三类陈述规范一致)。</li>
+</ul>
+<h3 id="6-4-可信度维度采用-扣分制">6.4 可信度维度采用"扣分制"</h3>
+<p>撤稿/PubPeer 命中/掠夺性 venue 等负信号不做线性加减,而是<strong>大幅降权直至一票否决</strong>;正常论文可信度分默认从满分起步,按红旗扣减。</p>
+<h3 id="6-5-六维评分模型">6.5 六维评分模型</h3>
+<p>综合分 = Σ(维度分 × 学科权重)。每维 0–100,所有引用类特征先做<strong>学科 × 年份百分位归一化</strong>。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>可计算特征</th>
+<th>数据源</th>
+<th>基线权重</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>质量</strong></td>
+<td>SciScore 类方法学检测、statcheck 统计一致性、venue 分级(第 5 章)、注册报告标志、样本量/预注册</td>
+<td>SciScore、statcheck、OpenAlex、OSF</td>
+<td>20%</td>
+</tr>
+<tr>
+<td><strong>创新</strong></td>
+<td>摘要 embedding 与近期文献的距离(新颖度)、参考文献组合非常规性(Uzzi atypicality)、LLM 创新性初判(受 6.3 约束)</td>
+<td>自建 embedding、引文图</td>
+<td>15%</td>
+</tr>
+<tr>
+<td><strong>影响力</strong></td>
+<td>学科内引用百分位、引用增速(<code>counts_by_year</code> 斜率)、influential citations、<strong>冷启动:题目+摘要 LLM 预测分</strong></td>
+<td>OpenAlex、S2、自建模型</td>
+<td>20%</td>
+</tr>
+<tr>
+<td><strong>可信度</strong></td>
+<td>撤稿/关注表达、PubPeer 命中、预印本 vs 正式版、venue 预警状态、作者/机构既往撤稿(扣分制)</td>
+<td>Retraction Watch、Crossref、OpenAlex</td>
+<td>20%</td>
+</tr>
+<tr>
+<td><strong>相关性</strong></td>
+<td>与用户主题档案的 embedding 相似度、引用了用户关注的作者/论文、主题标签匹配</td>
+<td>用户模型(第 11 章)</td>
+<td>15%</td>
+</tr>
+<tr>
+<td><strong>时效性</strong></td>
+<td>发表时间衰减、所属主题热度斜率(第 7 章)、早期关注(Bluesky/新闻/政策)</td>
+<td>日期、自建 altmetrics</td>
+<td>10%</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>可选加分项</strong>:代码/数据可用性("声明有"与"实际可访问"分开核验)→ 并入质量或影响力。</p>
+<h3 id="6-6-分学科权重调整">6.6 分学科权重调整</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>CS/AI</th>
+<th>生物医学</th>
+<th>社会科学</th>
+<th>人文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>质量</td>
+<td>15%</td>
+<td><strong>28%</strong></td>
+<td>22%</td>
+<td>18%</td>
+</tr>
+<tr>
+<td>创新</td>
+<td><strong>22%</strong></td>
+<td>12%</td>
+<td>15%</td>
+<td>20%</td>
+</tr>
+<tr>
+<td>影响力</td>
+<td>20%</td>
+<td>20%</td>
+<td>18%</td>
+<td>12%</td>
+</tr>
+<tr>
+<td>可信度</td>
+<td>13%</td>
+<td><strong>25%</strong></td>
+<td>22%</td>
+<td>20%</td>
+</tr>
+<tr>
+<td>相关性</td>
+<td>15%</td>
+<td>10%</td>
+<td>13%</td>
+<td>20%</td>
+</tr>
+<tr>
+<td>时效性</td>
+<td><strong>15%</strong></td>
+<td>5%</td>
+<td>10%</td>
+<td>10%</td>
+</tr>
+</tbody>
+</table></div>
+<p>调整逻辑:CS/AI 是预印本文化——时效与创新最重,影响力用短窗增速,代码可用性并入质量加权;生物医学——严谨性/撤稿风险/可复现是核心(质量+可信度占 53%),时效弱化(引用周期长);社会科学——复制危机使方法透明吃重,Overton 政策引用对影响力有额外意义;人文——引用稀疏,弱化影响力、强化相关性与创新。权重按季度用"当期评分 vs 事后引用/获奖"回测校准(与 12.3 节奏一致)。</p>
+<hr />
+<h2 id="7-最新研究趋势识别方法">7. 最新研究趋势识别方法</h2>
+<blockquote>
+<p>调研时间:2026-07,关键论断均经原始文献核验(来源见 7.7)。</p>
+</blockquote>
+<h3 id="7-1-方法地基-四大文献计量范式的取舍">7.1 方法地基:四大文献计量范式的取舍</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>奠基文献</th>
+<th>可即时计算</th>
+<th>时滞</th>
+<th>在本系统中的角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>共引分析</td>
+<td>Small 1973</td>
+<td>否(需被引积累)</td>
+<td>高(2–5 年)</td>
+<td>只用于领域知识基础回顾,不用于趋势</td>
+</tr>
+<tr>
+<td><strong>文献耦合</strong></td>
+<td>Kessler 1963</td>
+<td><strong>是</strong>(发表当天可算)</td>
+<td>低</td>
+<td><strong>研究前沿聚类的引用侧首选</strong></td>
+</tr>
+<tr>
+<td>关键词共现</td>
+<td>Callon et al. 1983/1991(战略坐标图:向心度×密度四象限)</td>
+<td>是</td>
+<td>低</td>
+<td>主题结构与演化;现代做法用 NLP 短语替代人工标引词</td>
+</tr>
+<tr>
+<td>合作网络</td>
+<td>Newman 2001</td>
+<td>是</td>
+<td>低</td>
+<td>社区形成、新作者流入信号</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>关键实证</strong>:Boyack &amp; Klavans 2010(215 万篇生物医学论文):文献耦合略优于共引、直接引用最差、<strong>引用+文本混合方法全面最优</strong>——本系统采用混合路线(嵌入聚类为主、耦合为辅)。</p>
+<h3 id="7-2-突发检测-kleinberg-burst-detection">7.2 突发检测(Kleinberg burst detection)</h3>
+<ul>
+<li><strong>原理</strong>(Kleinberg KDD 2002):事件流建模为两状态自动机(基线态/突发态),突发率 p₁ = s×p₀(s 控制门槛),状态跃迁付出与 γ 成正比的代价(抑制噪声跳变),Viterbi 式动态规划求最优状态序列;burst weight 度量强度。实现:R <code>bursts</code> 包、Python <code>burst_detection</code>。</li>
+<li><strong>CiteSpace</strong>(Chen 2006)将其推广到多词术语与文献被引序列(keyword burst / citation burst);VOSviewer <strong>不支持</strong> burst。</li>
+<li>组合用法:Kleinberg burst(检测突变)+ <strong>Mann–Kendall 检验 + Sen's slope</strong>(检测持续单调趋势)互补(Scientometrics 2024 有范例)。</li>
+</ul>
+<h3 id="7-3-主题建模选型">7.3 主题建模选型</h3>
+<ul>
+<li><strong>实证对比</strong>(Egger &amp; Yu 2022, Frontiers in Sociology):BERTopic 最佳,NMF 次之,LDA 最弱(产出泛而无关的主题)。警示:嵌入类方法主题数多、HDBSCAN 产生大量 outlier、UMAP/HDBSCAN 有运行间随机性。</li>
+<li><strong>当代标准做法</strong>:<strong>SPECTER2 科学文献嵌入(引用图信号预训练,Cohan et al. 2020)+ UMAP + HDBSCAN + c-TF-IDF</strong>(即定制化 BERTopic);LDA 仅作基线。评估用主题一致性 C_v/NPMI(Röder 2015)+ 人工抽检。</li>
+<li><strong>对本系统关键的 BERTopic 能力</strong>(官方文档确认):<code>topics_over_time()</code>(动态主题)、<code>partial_fit()</code>(增量)、<code>hierarchical_topics()</code>、<code>merge_topics()</code>——天然支持"增量摄入 + 时序演化"。</li>
+</ul>
+<h3 id="7-4-新兴主题的操作性定义">7.4 新兴主题的操作性定义</h3>
+<p>领域公认框架收敛于四个可计算维度:<strong>novelty(新颖)+ growth(增长)+ coherence/persistence(凝聚且持续)+ impact/community(影响与社区)</strong>:</p>
+<ul>
+<li>Rotolo, Hicks &amp; Martin 2015(Research Policy):新兴技术五属性——根本新颖、相对快速增长、连贯性、显著影响、不确定性(最后一项作解释性维度)。</li>
+<li>Small, Boyack &amp; Klavans 2014:以"新出现的聚类"与"快速增长的聚类"操作化 emergence。</li>
+<li>Porter et al. 2019:可计算 emergence score;Wang 2018(JASIST):novelty + growth + coherence + 科学影响。</li>
+</ul>
+<h3 id="7-5-增长指标与先行信号">7.5 增长指标与先行信号</h3>
+<ul>
+<li><strong>全科学基线增长率:4.10%/年,倍增周期 17.3 年</strong>(Bornmann et al. 2021, 已核验)——判断"某主题增长是否跑赢大盘"的分母。</li>
+<li><strong>先行信号排序</strong>(仪表盘按此分层,禁止用滞后信号否决先行信号):<strong>基金(先行 2–3 年)→ 预印本(先行约 6 个月,bioRxiv 预印本→期刊发表中位间隔 166 天,Abdill &amp; Blekhman 2019)→ 期刊论文 → 引用(滞后 1–3 年)</strong>。</li>
+<li>基金数据可编程获取:NIH RePORTER API v2(全文检索 + 金额,约 1 req/s)、NSF Awards API(每页 25 条、单查询上限 3000 条、2007 年起)。</li>
+<li><strong>反例警示</strong>:睡美人现象并不罕见(Ke et al. 2015, PNAS, 2200 万篇论文)——引用类指标对 &lt;18 个月的主题不作硬条件。</li>
+</ul>
+<h3 id="7-6-炒作识别-有实证支撑的信号">7.6 炒作识别(有实证支撑的信号)</h3>
+<ul>
+<li><strong>石墨烯指纹</strong>(Klincewicz 2016):论文量指数增长的同时,<strong>篇均引用与高被引占比下降</strong>(数量跑赢质量)——核心判别量 <code>cpp_trend</code>。</li>
+<li><strong>语言 hype</strong>:PubMed 摘要积极词汇 40 年 +880%(Vinkers et al. 2015, BMJ);NIH 申请书 hype 形容词 +1378%(Millar 系列,139 词表);hype 句子级检测微调 BERT 达 86.1% 准确率(arXiv:2509.24638)——词表与分类器可直接复用。</li>
+<li><strong>关注度—影响脱节</strong>:Altmetric 与引用相关性弱;媒体声量远超引用增长是炒作信号。</li>
+<li><strong>Proteus 现象</strong>(Ioannidis 2006):早期夸大主张与极端反驳快速交替——争议标签的理论依据。</li>
+<li>Gartner hype cycle 本身实证支持有限(Dedehayir &amp; Steinert 2016),不直接套用曲线,只借用"期望峰—幻灭"动态。</li>
+</ul>
+<h3 id="7-7-趋势识别流程-可操作交付">7.7 趋势识别流程(可操作交付)</h3>
+<pre><code>论文流(OpenAlex/S2/arXiv/PubMed)+ 基金流(NIH/NSF)
+ → [1]摄入清洗 → [2]SPECTER2 嵌入 → [3]聚类(UMAP+HDBSCAN/BERTopic)
+ → [4]主题级七组指标 → [5]规则引擎打六类标签(可复合) → [6]人工核查视图
+</code></pre>
+<p><strong>最小数据字段</strong>:paper_id、title+abstract、pub_date(到月)、references、authors+affiliations 为必需;citation 时间切片(OpenAlex <code>counts_by_year</code>)、venue+doc_type 强烈建议;撤稿状态、基金号、Altmetric 可选。</p>
+<p><strong>七组主题级指标</strong>(每主题 × 每时间窗):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>组</th>
+<th>核心指标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A 增长</td>
+<td>相对增长(CAGR÷领域基线)、Kleinberg burst(s=2, γ=1 起步)、Mann–Kendall+Sen's slope、基金增长、预印本增速</td>
+</tr>
+<tr>
+<td>B 新颖</td>
+<td>主题年龄、质心新颖度(1−max 历史相似度)、新术语比例、参考文献 Price 指数</td>
+</tr>
+<tr>
+<td>C 凝聚</td>
+<td>聚类内平均余弦 + 主题词 NPMI、跨窗口存活数(persistence)</td>
+</tr>
+<tr>
+<td>D 影响</td>
+<td>引用速度/加速度、主题外引用占比、<strong>篇均引用趋势 cpp_trend</strong></td>
+</tr>
+<tr>
+<td>E 社区</td>
+<td>新作者占比、机构多样性、活跃作者增速</td>
+</tr>
+<tr>
+<td>F 炒作</td>
+<td>hype 词表 z 分数、Altmetric/引用比、综述占比增速、低质 venue 混合度</td>
+</tr>
+<tr>
+<td>G 争议</td>
+<td>comment/letter/erratum 占比、撤稿率、结论方向震荡度</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>六类标签判定</strong>(顺序:衰退→争议→疑似炒作→新兴→快速增长→成熟;争议/炒作可与其他复合;阈值一律用领域内分位数,每半年用已知案例回测重校):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>标签</th>
+<th>判定要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>新兴</strong></td>
+<td>年龄 ≤3 年 且 novelty≥P75 且 相对增长 ≥2× 基线 且 coherence≥P50 且存活 ≥3 个月度窗口 且新作者占比 ≥0.5;引用不作硬条件</td>
+</tr>
+<tr>
+<td><strong>快速增长</strong></td>
+<td>已过冷启动,相对增长 ≥2× 基线(或 CAGR≥20%),burst 活跃或 MK 显著上升,且 <strong>cpp_trend≥0</strong>(排除纯数量膨胀)</td>
+</tr>
+<tr>
+<td><strong>成熟</strong></td>
+<td>体量 ≥P50 且增速与基线差 &lt;5pp 持续 ≥2 年,参考文献变旧,新作者占比低位稳定</td>
+</tr>
+<tr>
+<td><strong>衰退</strong></td>
+<td>论文量与引用速度<strong>双降</strong>且 MK 显著下降 ≥2 年、新作者 &lt;0.25 且降、基金负增长;需排除"主题改名漂移"</td>
+</tr>
+<tr>
+<td><strong>争议</strong></td>
+<td>活跃且满足 ≥2 项:dispute_ratio≥2× 中位、撤稿/重复失败事件、结论震荡、高被引论文遭显著负面引用;触发即转人工</td>
+</tr>
+<tr>
+<td><strong>疑似炒作</strong></td>
+<td>相对增长 ≥2× 基线 且满足 ≥3 项:cpp_trend&lt;0、hype 词 ≥P90、Altmetric/引用比 ≥P90、综述增速 ≥2× 论文增速、venue 质量恶化、novelty 低;标签仅为"疑似",必须人工复核</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>增量节奏</strong>:每周——增量拉取、嵌入归入既有主题(不改标签,只刷新 burst 告警,12 周 EWMA 平滑出版批次噪声);每月——重算全部指标(36 个月滑窗)、更新标签并输出 diff、检查 outlier 池(占比 &gt;15% 或 ≥20 篇自聚类达标 → 注册候选新主题);每季/半年——全量重聚类 + Hungarian 匹配对齐新旧主题、继承标签历史、重校阈值。</p>
+<p><strong>必须处理的系统性偏差</strong>:① 索引回填滞后(近 2–3 个月覆盖不全,增长率需用同期完整度曲线校正,或只对 ≥3 个月前数据下结论);② 引用时滞与睡美人;③ 先行信号分层展示。</p>
+<p><strong>工具定位</strong>:可编程流水线用 Python(litstudy / BERTopic / burst_detection / pymannkendall,均开源)或 R(bibliometrix, GPL-3);CiteSpace / VOSviewer 只作为<strong>人工核查与可视化终端</strong>,不进流水线。</p>
+<p><strong>核心来源</strong>:Small 1973 (DOI:10.1002/asi.4630240406); Kessler 1963; Boyack &amp; Klavans 2010 (DOI:10.1002/asi.21419); Kleinberg 2002/2003; Chen 2006 (CiteSpace II); Grootendorst 2022 (arXiv:2203.05794); Egger &amp; Yu 2022; Cohan et al. 2020 SPECTER (arXiv:2004.07180); Rotolo et al. 2015 (DOI:10.1016/j.respol.2015.06.006); Bornmann et al. 2021; Ke et al. 2015 (PNAS); Abdill &amp; Blekhman 2019 (eLife); Klincewicz 2016; Vinkers et al. 2015 (BMJ); Millar et al. 2022 (JAMA Netw Open); Ioannidis 2006 (Proteus)。</p>
+<hr />
+<h2 id="8-重点论文总结标准">8. 重点论文总结标准</h2>
+<h3 id="8-1-论文卡片-paper-card-字段规范">8.1 论文卡片(Paper Card)字段规范</h3>
+<p>每篇进入周报 / 月报 / 推荐列表的论文,生成一张结构化"论文卡片",分为四个区:</p>
+<p><strong>A. 书目区(纯元数据,机器填充,不允许生成式改写)</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字段</th>
+<th>来源</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标题 / 作者 / 机构</td>
+<td>数据源元数据</td>
+<td>机构需消歧(ROR ID)</td>
+</tr>
+<tr>
+<td>发表时间</td>
+<td>元数据</td>
+<td>区分:预印本首发时间 / 正式发表时间</td>
+</tr>
+<tr>
+<td>期刊或会议 + 本系统分级</td>
+<td>元数据 + 第 5 章分级框架</td>
+<td>标注分级依据</td>
+</tr>
+<tr>
+<td>DOI / 官方链接</td>
+<td>元数据</td>
+<td>优先 DOI,预印本给 arXiv/bioRxiv ID</td>
+</tr>
+<tr>
+<td>论文类型</td>
+<td>分类器 + 元数据</td>
+<td>原始研究 / 综述 / 系统综述 / 指南共识 / 基准数据集 / 观点评论</td>
+</tr>
+<tr>
+<td>代码与数据可用性</td>
+<td>自动检测 + 链接验证</td>
+<td>"声明有"≠"实际可访问",分开标注</td>
+</tr>
+<tr>
+<td>撤稿 / 勘误状态</td>
+<td>撤稿数据库同步</td>
+<td>卡片顶部红色标注</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>B. 内容区(生成式摘要,但每条须锚定原文)</strong></p>
+<ul>
+<li>研究背景 → 研究问题 → 核心方法 → 数据来源与实验设计 → 主要发现 → 创新点 → 局限性 → 与已有工作的区别 → 研究意义与应用价值。</li>
+<li>生成规则:主要发现与局限性<strong>必须</strong>能定位到摘要或全文的具体段落;无法锚定的内容不得写入。</li>
+</ul>
+<p><strong>C. 评估区(系统判断,显式标注为系统观点)</strong></p>
+<ul>
+<li>六维评分(第 6 章)+ 一句话推荐理由 + "适合哪类读者"(按用户画像:本科生 / 硕博 / 资深研究者 / 产业研发)。</li>
+<li>可信度判断:列出正负信号清单(样本量、基线、预注册、利益冲突声明、venue 预警状态等),不输出笼统的"可信 / 不可信"。</li>
+</ul>
+<p><strong>D. 外部评价区(转述他人观点,须注明出处)</strong></p>
+<ul>
+<li>引用语境(支持 / 反驳引用)、同行评论、媒体与政策关注、PubPeer 讨论(如有)。</li>
+</ul>
+<h3 id="8-2-三类陈述的强制区分-反幻觉核心规范">8.2 三类陈述的强制区分(反幻觉核心规范)</h3>
+<p>所有生成文本必须归入且仅归入以下三类,并在渲染层用可视化标记区分:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>定义</th>
+<th>标记</th>
+<th>校验方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>原文陈述</strong></td>
+<td>论文明确写出的结论</td>
+<td>「论文称」</td>
+<td>引用锚点(章节 / 句子级),抽检时可对照原文</td>
+</tr>
+<tr>
+<td><strong>系统推断</strong></td>
+<td>系统基于论文内容 + 外部数据得出的判断</td>
+<td>「系统评估」</td>
+<td>附特征与规则依据</td>
+</tr>
+<tr>
+<td><strong>第三方评价</strong></td>
+<td>其他论文、评论者、媒体的观点</td>
+<td>「外部评价」</td>
+<td>附出处链接</td>
+</tr>
+</tbody>
+</table></div>
+<p>违规模式(禁止):把"作者未做但系统推测的适用场景"写进主要发现;把引用者的批评写成论文自己承认的局限。</p>
+<h3 id="8-3-分级摘要策略">8.3 分级摘要策略</h3>
+<p>按论文在报告中的地位分三档,控制成本与质量:</p>
+<ol>
+<li><strong>重点推荐(每周 3–5 篇)</strong>:全文(OA 可得时)解析 + 完整卡片 + 人工抽检队列。</li>
+<li><strong>值得关注(每周 10–20 篇)</strong>:摘要级卡片(B 区仅背景 / 问题 / 发现 / 局限四项)。</li>
+<li><strong>收录可查(其余)</strong>:仅书目区 + 一句话主题归类,不做生成式总结。</li>
+</ol>
+<hr />
+<h2 id="9-研究空白与研究机会识别方法">9. 研究空白与研究机会识别方法</h2>
+<h3 id="9-1-研究空白的分类学-方法论地基">9.1 研究空白的分类学(方法论地基)</h3>
+<p>学界对 research gap 有一条清晰的方法谱系,系统应直接采用而非自创分类:</p>
+<ul>
+<li><strong>Robinson, Saldanha &amp; McKoy (2011, J Clin Epidemiol / AHRQ 报告)</strong>:源于系统综述工程。两大部分:(a) 用 <strong>PICOS 要素</strong>(人群/干预/对照/结局/情境)刻画每个 gap;(b) <strong>gap 成因四分类</strong>——信息不足或不精确、信息有偏、结果不一致或一致性未知、信息不适切。成因分类与 GRADE 证据分级的域相互映射。来源:PMID 21937195;https://www.ncbi.nlm.nih.gov/books/NBK62478/</li>
+<li><strong>Müller-Bloch &amp; Kranz (2015, ICIS)</strong>:定性文献综述中严谨识别 gap 的六分类(矛盾证据 / 知识空白 / 行动—知识冲突 / 方法 / 评估空白 / 理论应用空白)。</li>
+<li><strong>Miles (2017)</strong>:上述两者的七类合并版(证据 / 知识 / 实践—知识 / 方法 / 实证 / 理论 / 人群 gap),流传最广。<strong>注意:这是博士生工作坊文稿而非同行评审论文</strong>,引用时应说明。</li>
+<li>2022–2026 年<strong>没有</strong>出现以"gap 识别方法"为主题的专门系统综述(经检索确认);最接近的是 LLM4SR(arXiv:2501.04306)与假设生成综述(arXiv:2504.05496)。</li>
+</ul>
+<p><strong>系统采用方案</strong>:以 Miles 七类为用户可见标签(易懂),内部映射回 Robinson 四类成因(可与证据强度挂钩)。</p>
+<h3 id="9-2-从论文文本自动抽取-gap-的技术现状">9.2 从论文文本自动抽取 gap 的技术现状</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>工作</th>
+<th>任务</th>
+<th>效果</th>
+<th>对本系统的启示</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lahav et al. 2022 (AAAI), arXiv:2108.13751</td>
+<td>从全文抽取 challenge / direction 句</td>
+<td>PubMedBERT F1≈0.77–0.78;用户实验显著优于 PubMed 基线</td>
+<td>句子级抽取是成熟可行的第一步</td>
+</tr>
+<tr>
+<td>南理工团队 2023 (J. Informetrics), arXiv:2212.13860</td>
+<td>Future work 句识别 + 六类分型</td>
+<td>识别 Macro-F1 90.7%;分类 SciBERT 加权 F1 72.6%</td>
+<td>FWS 六分型可直接复用;代码数据公开</td>
+</tr>
+<tr>
+<td>LimGen 2024 (ECML-PKDD), arXiv:2403.15529</td>
+<td>LLM 生成论文 limitations</td>
+<td>4068 篇 ACL 论文数据集</td>
+<td>金标准是作者自报 limitations,存在自报偏差</td>
+</tr>
+<tr>
+<td>LimitGen 2025, arXiv:2507.02694</td>
+<td>benchmark:LLM 能否发现论文关键局限</td>
+<td><strong>文献检索增强能显著提升</strong>局限识别</td>
+<td>系统的 gap 抽取必须带 RAG,裸 LLM 不够</td>
+</tr>
+<tr>
+<td>FutureGen 2025, arXiv:2503.16561</td>
+<td>RAG + LLM 反馈生成 future work</td>
+<td>GPT-4o mini + 反馈最佳</td>
+<td>反馈回路有效</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>共性局限(设计约束)</strong>:金标准依赖作者自报(自报偏差);评测多用 LLM-as-judge;领域集中在 NLP/生物医学;<strong>裸 LLM 生成的 limitation 泛泛而谈,必须检索增强才能具体化</strong>。另一个有意思的元发现:至今没有以方法学分类学(Miles 七类等)为标签体系的 gap 抽取语料——本系统积累的标注数据本身有学术价值。</p>
+<h3 id="9-3-系统综述工程中的证据缺口方法-跨学科可迁移">9.3 系统综述工程中的证据缺口方法(跨学科可迁移)</h3>
+<ul>
+<li><strong>Evidence Gap Map(3ie 方法论)</strong>:构建<strong>干预 × 结局矩阵</strong>,把已有研究映射进单元格;区分<strong>绝对缺口</strong>(几乎无研究的单元格)与<strong>综合缺口</strong>(有原始研究但缺高质量综述)。这个矩阵思想可推广为任意领域的"方法 × 问题 / 数据 × 场景"缺口热图——是月报"研究空白"栏的理想可视化。来源:https://www.3ieimpact.org/evidence-hub/evidence-gap-maps</li>
+<li><strong>EPICOT 框架(Brown et al. 2006, BMJ)</strong>:研究建议的结构化表述——Evidence 现状 / Population / Intervention / Comparison / Outcome / Time stamp,可选扩展疾病负担与研究设计。来源:PMC1602035</li>
+<li><strong>Cochrane Handbook 第 15.6.3 节</strong>:禁止只说"需要更多研究",必须按 PICO 域逐结局说明所需研究的性质,并与 GRADE 证据确定性挂钩。</li>
+</ul>
+<p><strong>迁移结论</strong>:医学以外的学科同样适用其精神——系统输出的每个"研究空白"必须结构化(在什么对象上 / 用什么方法 / 缺什么证据 / 截至何时),拒绝"这个方向值得更多研究"式的空话。</p>
+<h3 id="9-4-假设生成的可靠性-实证基础与失败模式">9.4 假设生成的可靠性:实证基础与失败模式</h3>
+<p><strong>传统路线</strong>:Literature-Based Discovery(Swanson ABC 模型,1986)——A 与 C 不共现但均与中介 B 共现 → 假设 A–C 关联;经典成功案例(鱼油–雷诺氏病、镁–偏头痛)后经临床证实。核心评估难题至今未解:无标准基准、"未被发现的知识"无法直接验证。</p>
+<p><strong>LLM 生成研究 idea 的关键实证(必须写进系统设计)</strong>:</p>
+<ul>
+<li><strong>Si, Yang &amp; Hashimoto 2024(arXiv:2409.04109,79 位专家 298 份盲评)</strong>:LLM idea 新颖性显著高于人类(5.64 vs 4.84),可行性略低;但 <strong>diversity collapse</strong> 严重——4000 个生成 idea 去重后仅约 200 个(5%);<strong>LLM 自评估不可靠</strong>(最佳 LLM 评审准确率 53.3%,低于人类间一致性 56.1%)。</li>
+<li><strong>Ideation-Execution Gap(Si et al. 2025, arXiv:2506.20803, ICLR 2026)</strong>:43 位专家每人 100+ 小时真实执行这些 idea 后,LLM idea 全指标降幅显著大于人类 idea,<strong>排名反转</strong>——新颖性优势在执行后消失。</li>
+<li><strong>AI Scientist 独立评估(arXiv:2502.14297)</strong>:引用中位数仅 5 条且陈旧、42% 实验因代码错误失败、<strong>57% 稿件含幻觉数值</strong>、把成熟技术误判为新颖。</li>
+</ul>
+<p><strong>六大已证实失败模式</strong>:幻觉引用、把已解决问题当 gap、可行性误判、idea 同质化、与已发表工作重复(知识泄漏)、LLM 自评估不可靠。</p>
+<h3 id="9-5-研究机会评估框架-交付核心">9.5 研究机会评估框架(交付核心)</h3>
+<p>设计原则:每个候选机会必须<strong>可证伪、可溯源、可反驳</strong>,把 9.4 的失败模式直接转成强制门禁。</p>
+<p><strong>六维评估表(每个候选机会一份)</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>证据要求(硬性)</th>
+<th>防护的失败模式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 现有基础</td>
+<td>≥3 条经 DOI/arXiv 解析验证的真实文献,至少 1 条为近 18 个月;标注检索日期与数据源</td>
+<td>幻觉引用、文献感知过时</td>
+</tr>
+<tr>
+<td>② 不足(gap)</td>
+<td>映射到 9.1 的 gap 分类 + PICOS/EPICOT 要素;<strong>附"为何是真 gap"的反驳性检查</strong>(记录"已检索未发现解法"的检索式与日期);"未搜到"≠gap</td>
+<td>把已解决问题当 gap</td>
+</tr>
+<tr>
+<td>③ 可行性</td>
+<td>列资源清单(数据/算力/伦理审批)与获取路径;<strong>禁止凭 ideation 评分断言可行</strong></td>
+<td>ideation-execution gap</td>
+</tr>
+<tr>
+<td>④ 创新度</td>
+<td>与最相似 N 篇<strong>逐条差异比对</strong>;标注新颖性来源(新问题/新方法/新数据/新组合)</td>
+<td>同质化、知识泄漏</td>
+</tr>
+<tr>
+<td>⑤ 风险</td>
+<td>撤稿检查、合规检查、抢发风险;标注置信度</td>
+<td>数据污染</td>
+</tr>
+<tr>
+<td>⑥ 适合人群</td>
+<td>明确专长/团队规模/经费门槛,<strong>并写明"不适合谁"</strong>;是否可能成文、适合投稿的 venue 类型</td>
+<td>过度承诺</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>证据分级</strong>:L1 已验证(DOI 可解析、元数据一致、非撤稿)/ L2 检索命中未逐条核实(标"待核")/ L3 模型推断——<strong>禁止作为 gap 成立或可行性结论的唯一依据</strong>。</p>
+<p><strong>防止过度承诺的输出规范(强制)</strong>:
+1. 每个结论附置信度(高/中/低)+ 证据标签;无 L1 证据禁用"必然、突破性、空白"等绝对化措辞;
+2. <strong>引用零幻觉门禁</strong>:所有引用输出前经存在性校验 + 撤稿校验,未通过者只进"待核清单";
+3. gap 主动证伪:声明检索范围与"可能已被解决,未穷尽检索";
+4. 新颖性评分不得转述为可行性或价值承诺;
+5. 批量生成先去重并<strong>报告去重率</strong>;
+6. 标明哪些环节 LLM 自动产出、哪些经人工核验;LLM 自评分不作最终排序唯一依据。</p>
+<hr />
+<h2 id="10-周报和月报设计">10. 周报和月报设计</h2>
+<h3 id="10-1-设计原则">10.1 设计原则</h3>
+<ol>
+<li><strong>倒金字塔</strong>:最重要的信息(本期必读 3 篇 + 一句话领域动态)放在最前,细节靠后;读者应能在 90 秒内读完摘要层。</li>
+<li><strong>周报重"增量",月报重"结构"</strong>:周报回答"这周发生了什么新的",月报回答"这个领域的格局发生了什么变化"。</li>
+<li><strong>每条内容附证据与链接</strong>,每个评分可展开看依据。</li>
+<li><strong>显式的"本期覆盖声明"</strong>:本期扫描了哪些源、多少篇、过滤掉多少、哪些源缺数——防止"没写=不存在"的误读。</li>
+</ol>
+<h3 id="10-2-周报模板">10.2 周报模板</h3>
+<pre><code class="language-markdown"># 【领域名】研究周报 · 第 N 期(YYYY-MM-DD ~ YYYY-MM-DD)
+
+## 0. 本期速览(≤5 条,一句话一条)
+## 1. 本期必读(3–5 篇,完整论文卡片)
+## 2. 值得关注的新论文(10–20 篇,精简卡片,按子主题分组)
+## 3. 快速升温的主题(本周提及量/预印本量突增的 1–3 个主题 + 证据)
+## 4. 领域动态(会议截稿/录用结果、重要报告、撤稿与争议、数据集/工具发布)
+## 5. 争议与讨论(有明显分歧引用或公开辩论的工作)
+## 6. 短期值得跟进的问题(1–3 条,附&quot;为什么是现在&quot;)
+## 附录. 本期覆盖声明(扫描源、总量、过滤漏斗、已知缺口)
+</code></pre>
+<h3 id="10-3-月报模板">10.3 月报模板</h3>
+<pre><code class="language-markdown"># 【领域名】研究月报 · YYYY 年 M 月
+
+## 0. 本月综述(300 字以内的领域叙事)
+## 1. 本月最重要成果 Top 5–10(完整卡片 + 入选理由)
+## 2. 研究格局变化
+   - 论文量与主题分布(对比上月/去年同期)
+   - 研究热点排名(升/降/新进/退出)
+   - 六类方向标签变动(成熟/快速增长/新兴/衰退/争议/疑似炒作)
+## 3. 主要团队与机构动态(高产/新入场团队、代表作)
+## 4. 方法与资源(本月重要新方法、数据集、基准、工具)
+## 5. 共识与争议(正在形成的共识 / 悬而未决的争论,各附双方证据)
+## 6. 研究空白与机会(2–5 条,按第 9 章机会框架输出,含风险标注)
+## 7. 下月建议追踪(方向 + 触发事件,如&quot;某会议将放榜&quot;)
+## 附录. 数据与方法说明(覆盖声明 + 本月评分/聚类参数变动)
+</code></pre>
+<h3 id="10-4-其余模板">10.4 其余模板</h3>
+<ul>
+<li><strong>论文卡片模板</strong>:即 8.1 的四区结构。</li>
+<li><strong>趋势分析模板</strong>:主题名 → 标签(六类之一)→ 关键指标(论文量曲线、引用加速度、顶会顶刊渗透率、团队多样性)→ 代表论文 3 篇 → 系统判读 → 不确定性说明。</li>
+<li><strong>研究机会模板</strong>:见第 9 章机会评估框架(研究问题 / 现有基础 / 不足 / 为何值得 / 可能方法 / 所需数据 / 难度 / 创新度 / 预期贡献 / 风险 / 适合人群 / 成文可能与投稿去向)。</li>
+<li><strong>个性化推荐模板</strong>:推荐论文 + 推荐理由(与用户兴趣模型的哪个成分匹配)+ 反馈按钮(有用 / 无关 / 已读过),反馈回流兴趣模型(第 11、12 章)。</li>
+</ul>
+<h3 id="10-5-学科适配">10.5 学科适配</h3>
+<ul>
+<li>医学 / 生物:周报增加"临床相关性"栏与证据等级(RCT / 队列 / 病例);争议栏关注安全性信号。</li>
+<li>CS:周报强化会议周期事件(截稿、放榜、oral/best paper);"代码可用"权重高。</li>
+<li>数学 / 理论:降低周报频率的心理预期(可切换双周报),弱化"热度"类指标,强化"重要问题进展"叙事。</li>
+<li>社科 / 政策:增加工作论文(SSRN/NBER 类)与政策引用栏。</li>
+</ul>
+<hr />
+<h2 id="11-用户兴趣与学科分类体系">11. 用户兴趣与学科分类体系</h2>
+<h3 id="11-1-各方案对比">11.1 各方案对比</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>优点</th>
+<th>缺点</th>
+<th>定位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>固定学科分类</td>
+<td>简单、冷启动快</td>
+<td>粒度太粗,跨学科主题无处安放</td>
+<td>仅作导航入口</td>
+</tr>
+<tr>
+<td>树形学科分类(如 OpenAlex topics 层级)</td>
+<td>结构清晰、可继承参数</td>
+<td>树是静态的,新兴方向滞后</td>
+<td>作为<strong>骨架</strong></td>
+</tr>
+<tr>
+<td>关键词订阅</td>
+<td>精确、用户可控</td>
+<td>召回脆弱(同义词/缩写)、噪声高</td>
+<td>作为<strong>精调手段</strong></td>
+</tr>
+<tr>
+<td>自然语言兴趣描述</td>
+<td>门槛最低、表达力强</td>
+<td>需要解析,存在理解偏差</td>
+<td>作为<strong>主入口</strong></td>
+</tr>
+<tr>
+<td>期刊/会议订阅</td>
+<td>高置信、简单</td>
+<td>只覆盖"已知的好来源"</td>
+<td>辅助信号</td>
+</tr>
+<tr>
+<td>作者/机构订阅</td>
+<td>追踪团队动向有效</td>
+<td>覆盖面窄、有姓名消歧问题</td>
+<td>辅助信号</td>
+</tr>
+<tr>
+<td>论文种子扩展</td>
+<td>冷启动质量高("给我 5 篇代表作")</td>
+<td>依赖引用图质量</td>
+<td>强烈推荐的冷启动方式</td>
+</tr>
+<tr>
+<td>语义向量兴趣模型</td>
+<td>泛化好、可持续学习</td>
+<td>不可解释、漂移风险</td>
+<td>作为<strong>召回底座</strong></td>
+</tr>
+<tr>
+<td>多标签分类</td>
+<td>贴合真实兴趣(一人多题)</td>
+<td>管理复杂度</td>
+<td>基本假设:兴趣=多个独立主题</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="11-2-推荐的混合方案-主题档案-topic-profile">11.2 推荐的混合方案:「主题档案(Topic Profile)」</h3>
+<p>用户的每个研究兴趣 = 一个独立的主题档案,档案内部是多层表示:</p>
+<ol>
+<li><strong>锚定层</strong>:自然语言兴趣描述(必填)+ 3–10 篇种子论文(强烈建议)→ 系统解析出学科挂载点(树形分类节点,可多个)。</li>
+<li><strong>符号层</strong>:自动生成 + 用户可编辑的检索式(关键词 / 同义词组 / MeSH 或领域受控词表)、订阅的 venue / 作者 / 机构清单。</li>
+<li><strong>向量层</strong>:由兴趣描述 + 种子论文 + 用户反馈(点读 / 收藏 / 标记无关)持续更新的语义向量集合(多质心,而非单向量——一个兴趣往往有多个侧面)。</li>
+<li><strong>参数层</strong>:从学科挂载点继承的默认参数(评分权重、venue 分级表、趋势阈值、报告栏目开关),用户可覆盖。</li>
+</ol>
+<p>召回时三层并联(符号层保精确、向量层保泛化、订阅层保定向),融合去重后进入相关性排序(第 6 章相关性维度)。</p>
+<h3 id="11-3-兴趣模型的维护">11.3 兴趣模型的维护</h3>
+<ul>
+<li>每期报告的用户反馈(显式按钮 + 隐式点击)作为增量信号,小步更新向量层;符号层变更(加词 / 删词)必须经用户确认,保持可控感。</li>
+<li>漂移保护:向量层更新设学习率上限;每月向用户展示"系统理解的你的兴趣"(关键词云 + 代表论文),允许一键校正。</li>
+</ul>
+<hr />
+<h2 id="12-自动化研究工作流-方法论层">12. 自动化研究工作流(方法论层)</h2>
+<h3 id="12-1-总流程">12.1 总流程</h3>
+<pre><code>用户兴趣输入 → 主题档案构建(11 章)
+   ↓
+检索式生成 + 数据源路由(按学科选源,3 章)
+   ↓
+论文采集(增量,按日期游标) → 去重与版本合并(预印本↔正式版) → 元数据规范化(DOI/ROR/ORCID 对齐)
+   ↓
+venue 分级标注(4/5 章) → 相关性判断(粗排:向量+规则;精排:模型) → 质量/重要性评分(6 章)
+   ↓
+摘要/全文解析(仅入选论文,分级策略 8.3) → 主题聚类 → 趋势识别(7 章) → 论文总结(8 章) → 空白识别(9 章)
+   ↓
+报告草稿生成(10 章模板) → 质量门禁(自动校验:链接可达/引用锚定/撤稿检查) → 人工审核(抽检) → 发布推送
+   ↓
+用户反馈 → 兴趣模型更新(11.3) → 下一周期
+</code></pre>
+<h3 id="12-2-各步骤的方法归属-规则-传统-ml-llm-embedding-知识图谱-人工">12.2 各步骤的方法归属(规则 / 传统 ML / LLM / Embedding / 知识图谱 / 人工)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>首选方法</th>
+<th>理由与备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>检索式生成</td>
+<td>LLM 生成 + 规则校验 + 用户确认</td>
+<td>LLM 擅长同义词扩展;检索式必须可见可编辑</td>
+</tr>
+<tr>
+<td>数据源路由</td>
+<td>规则</td>
+<td>学科→源映射是稳定的配置</td>
+</tr>
+<tr>
+<td>采集与增量</td>
+<td>规则(游标 + 重试)</td>
+<td>确定性任务,不需要模型</td>
+</tr>
+<tr>
+<td>去重/版本合并</td>
+<td>规则(DOI/arXiv ID 精确匹配)+ 传统 ML(标题作者模糊匹配阈值)</td>
+<td>错误合并代价高,保守优先</td>
+</tr>
+<tr>
+<td>元数据规范化</td>
+<td>规则 + 权威 ID(DOI/ROR/ORCID)</td>
+<td>知识图谱的入口工序</td>
+</tr>
+<tr>
+<td>venue 分级</td>
+<td>规则(查表:分级框架的映射表)</td>
+<td>表由第 4/5 章方法离线维护</td>
+</tr>
+<tr>
+<td>相关性粗排</td>
+<td>Embedding 相似度 + 符号层命中</td>
+<td>高吞吐、低成本</td>
+</tr>
+<tr>
+<td>相关性精排 / 质量评分</td>
+<td>传统 ML(特征模型)+ LLM(少量文本维度,如创新性初判)</td>
+<td>可解释特征为主,LLM 输出仅作特征之一</td>
+</tr>
+<tr>
+<td>主题聚类</td>
+<td>Embedding + 聚类算法</td>
+<td>每期增量聚类 + 月度全量重聚</td>
+</tr>
+<tr>
+<td>趋势识别</td>
+<td>规则(指标阈值)+ 统计(突发检测)</td>
+<td>见第 7 章;LLM 仅用于给趋势命名与写叙事</td>
+</tr>
+<tr>
+<td>论文总结</td>
+<td>LLM(带引用锚定约束)+ 规则校验</td>
+<td>8.2 的三类陈述规范是硬约束</td>
+</tr>
+<tr>
+<td>空白识别</td>
+<td>LLM 抽取(限定 limitations/future work/综述)+ 证据交叉验证</td>
+<td>见第 9 章;单篇论文的说法不构成"空白"</td>
+</tr>
+<tr>
+<td>引用网络/合作网络</td>
+<td>知识图谱</td>
+<td>论文-作者-机构-venue-主题 五类节点</td>
+</tr>
+<tr>
+<td>报告生成</td>
+<td>LLM(模板槽填充)+ 规则渲染</td>
+<td>数字与链接由程序填,LLM 只写叙事段</td>
+</tr>
+<tr>
+<td>质量门禁</td>
+<td>规则(链接校验、撤稿比对、锚点存在性检查)</td>
+<td>全自动、一票否决</td>
+</tr>
+<tr>
+<td>人工审核</td>
+<td>人工(抽检制)</td>
+<td>重点推荐 100% 过人审;其余按比例抽检</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="12-3-节奏设计">12.3 节奏设计</h3>
+<ul>
+<li><strong>每日</strong>:增量采集、去重入库、撤稿状态同步。</li>
+<li><strong>每周</strong>:相关性排序 → 评分 → 周报流水线;周报生成后 24h 人审窗口。</li>
+<li><strong>每月</strong>:全量重聚类、趋势标签重算、venue 分级表检查、月报流水线、兴趣模型体检报告。</li>
+<li><strong>每季/每年</strong>:评分权重回测(用"当期评分 vs 事后引用/获奖"做校准)、分级框架更新(JCR/中科院分区/CCF 目录的年度更新)。</li>
+</ul>
+<hr />
+<h2 id="13-技术架构建议">13. 技术架构建议</h2>
+<blockquote>
+<p>🔒 按项目要求本阶段不做技术栈选型。本章此后将基于第 3 章数据源结论与第 12 章工作流推导,先行给出的唯一内容是 2.3 节的技术约束。</p>
+</blockquote>
+<h2 id="14-数据库与知识库设计">14. 数据库与知识库设计</h2>
+<blockquote>
+<p>🔒 同上,暂缓。设计输入已就绪:实体 = 论文 / 作者 / 机构 / venue / 主题 / 用户主题档案 / 报告;关键关系 = 引用、版本(预印本↔正式版)、隶属、发表于、属于主题。</p>
+</blockquote>
+<hr />
+<h2 id="15-数据质量控制">15. 数据质量控制</h2>
+<h3 id="15-1-撤稿与勘误同步-每日必做">15.1 撤稿与勘误同步(每日必做)</h3>
+<ul>
+<li><strong>主源:Crossref/Retraction Watch 合并库</strong>(2023-09 Crossref 收购后免费开放):GitLab CSV <strong>每工作日更新</strong>,20 字段含受控撤稿原因词表。<strong>实测规模(2026-07-16)</strong>:总计 71,128 条,其中撤稿 65,708、关注表达 3,581、更正 1,494。</li>
+<li><strong>不要只靠 Crossmark</strong>:出版商自登记的 update 元数据会漏掉约 2/3 撤稿(收购时点 Crossref 自有 1.4 万 vs RW 4.3 万)。</li>
+<li>交叉校验:PubMed PT="Retracted Publication" 双向链接;OpenAlex <code>is_retracted</code>。</li>
+<li>落地:每日增量同步 → 命中论文在库内打红旗 → 已进过报告的论文触发<strong>追溯更正通知</strong>(参考 Zotero 2019 年起的内置做法)。</li>
+</ul>
+<h3 id="15-2-论文工厂与引用操纵防线">15.2 论文工厂与引用操纵防线</h3>
+<ul>
+<li><strong>规模证据</strong>:Wiley/Hindawi 事件累计撤稿超 11,300 篇、关闭 19 种期刊、年收入损失 $35–40M;出版商自估投稿中约 2% 疑似造假。</li>
+<li><strong>识别信号</strong>(可编程接入):Problematic Paper Screener(9 类探测器:tortured phrases、SCIgen、Feet of Clay=引用撤稿文献等,每周扫 1.3 亿篇);PubPeer 命中;<strong>偷塞引用</strong>——实证发现某出版商 3 刊 DOI 元数据中 ≥9% 引用为正文不存在的注入引用(arXiv:2310.02192)→ 系统应抽样交叉核对正文引用与元数据引用;Clarivate 年度压制名单。</li>
+<li>处理:可疑 venue / 爆发式引用降权(与第 5 章预警级联动),不做公开指控,只做内部降权与标注。</li>
+</ul>
+<h3 id="15-3-llm-输出质量控制-有实证基线">15.3 LLM 输出质量控制(有实证基线)</h3>
+<ul>
+<li><strong>过度概括是最大风险</strong>:10 个主流 LLM 在 26–73% 案例中把有限结论改写为普适断言,是人类的近 5 倍(OR=4.85);<strong>"要求准确"的提示无效甚至适得其反</strong>(Peters &amp; Chin-Yee, RSOS 2025)→ 对策不是提示词,而是<strong>结构化抽取 + 保留原文限定词(样本、条件、时态)+ 人工抽检</strong>。</li>
+<li><strong>幻觉引用基线</strong>:GPT-3.5 39.6% / GPT-4 28.6% / Bard 91.4%(Chelli et al., JMIR 2024);AI 搜索工具 &gt;60% 回答错误(Tow Center 2025)→ 一切引用必须回链核验(与 8.2、9.5 的门禁一致)。</li>
+<li>质量门禁清单(全自动、一票否决):引用存在性解析;撤稿比对;锚点存在性检查(生成句可定位到原文);链接可达性;数字一致性抽检(statcheck 类)。</li>
+</ul>
+<h3 id="15-4-去重与版本合并">15.4 去重与版本合并</h3>
+<ul>
+<li>主键:DOI + OpenAlex ID;精确匹配优先,标题+作者模糊匹配设保守阈值(错误合并代价高于漏合并)。</li>
+<li><strong>预印本↔正式版</strong>:同一工作的两个版本必须合并为一条记录并保留版本历史(bioRxiv <code>pubs</code> 端点、Crossref 关系字段辅助);报告中引用正式版、标注预印本首发时间。</li>
+</ul>
+<h2 id="16-版权-合规与伦理风险">16. 版权、合规与伦理风险</h2>
+<h3 id="16-1-摘要版权-核心结论">16.1 摘要版权:核心结论</h3>
+<ul>
+<li>书目元数据(题名/作者/DOI)属事实,不受版权(美国 Feist 1991);<strong>摘要是文字创作,通常受版权保护</strong>(欧盟 Infopaq 案:11 词片段即可受保护)。</li>
+<li><strong>Crossref 官方立场</strong>:元数据 CC0,但<strong>摘要保留原发表许可</strong>,再利用者须自行确认——不能因为"从 Crossref 拿到"就认为可再分发。</li>
+<li><strong>OpenAlex 的处理即行业范本</strong>:不提供明文摘要,只给倒排索引(官方称因法律约束);注意倒排索引可无损重建,并非稳固豁免。</li>
+<li><strong>系统策略</strong>:对外展示优先用①自产的生成式摘要(基于合规获取的内容)、②OA 许可明确允许的原文摘要、③Elsevier 类源遵守 ≤200 字符片段 + DOI 规则;订阅源摘要不公开二次分发(Scopus 政策明文禁止)。</li>
+</ul>
+<h3 id="16-2-tdm-法律例外速查">16.2 TDM 法律例外速查</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>制度</th>
+<th>范围</th>
+<th>商业性</th>
+<th>opt-out</th>
+<th>合同可否排除</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>欧盟 DSM Art.3</td>
+<td>科研/文化遗产机构</td>
+<td>仅非营利科研</td>
+<td>否</td>
+<td><strong>不可排除</strong></td>
+</tr>
+<tr>
+<td>欧盟 DSM Art.4</td>
+<td>任何人、合法访问</td>
+<td>可商业</td>
+<td><strong>权利人可机器可读保留</strong>(Elsevier 已声明保留)</td>
+<td>可排除</td>
+</tr>
+<tr>
+<td>英国 CDPA s.29A</td>
+<td>合法访问者</td>
+<td>仅非商业研究</td>
+<td>否</td>
+<td>不可排除</td>
+</tr>
+<tr>
+<td>美国 fair use</td>
+<td>个案四要素;索引/检索类使用有利判例(Google Books/HathiTrust);AI 训练判例分化中</td>
+<td>视情形</td>
+<td>无</td>
+<td>独立于合同</td>
+</tr>
+<tr>
+<td><strong>中国</strong></td>
+<td><strong>无 TDM 例外</strong>;生成式 AI 办法要求训练数据"合法来源"</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>日本 30-4 条</td>
+<td>最宽松,含信息分析,可商业</td>
+<td>可</td>
+<td>无</td>
+<td>学理有争议</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>对本系统的含义</strong>:①商业化部署不能依赖欧盟 Art.3 / 英国 s.29A(仅非商业);②须检测并尊重机器可读权利保留(Art.4(3),AI Act 第 53 条强化);③中国境内运营须格外保守——依托 API 授权与 CC0/OA 许可,而非法定例外;④只用合法获取语料(Bartz v. Anthropic:盗版库不属 fair use)。</p>
+<h3 id="16-3-主要-api-条款要点-2026-07-核实">16.3 主要 API 条款要点(2026-07 核实)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>API</th>
+<th>许可/摘要再分发</th>
+<th>关键数字</th>
+<th>商用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Crossref</td>
+<td>元数据任意使用;摘要须查原许可</td>
+<td>polite pool 约 50 req/s(动态)</td>
+<td>可</td>
+</tr>
+<tr>
+<td><strong>OpenAlex</strong></td>
+<td>数据 CC0;摘要仅倒排索引</td>
+<td><strong>2026 新条款:信用额度制</strong>(免费 key $1/天 ≈1 万次 list 调用);旧"10 万/天"说法<strong>已作废</strong></td>
+<td>额度内可</td>
+</tr>
+<tr>
+<td>Semantic Scholar</td>
+<td><strong>按数据集分别许可</strong>(部分 CC BY-NC!)</td>
+<td>免费 key 初始 1 RPS</td>
+<td>商用须逐集核 NC</td>
+</tr>
+<tr>
+<td>PubMed</td>
+<td>政府作品无版权,摘要可能含第三方版权</td>
+<td>3/10 req/s</td>
+<td>自担第三方版权</td>
+</tr>
+<tr>
+<td>arXiv</td>
+<td>元数据(含摘要)CC0;<strong>全文不可再分发</strong></td>
+<td>每 3 秒 1 请求</td>
+<td>元数据可</td>
+</tr>
+<tr>
+<td>Europe PMC</td>
+<td>逐条许可;禁网页爬虫批量下载</td>
+<td>—</td>
+<td>OA 子集按 CC</td>
+</tr>
+<tr>
+<td>Unpaywall / CORE</td>
+<td><strong>未核实</strong>(页面拒抓),使用前须确认</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="16-4-综合风险控制表">16.4 综合风险控制表</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>风险</th>
+<th>控制机制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>机会识别</td>
+<td>幻觉引用 / 假 gap / 可行性误判 / 同质化 / 自评估失真 / 过度承诺</td>
+<td>9.5 的六条强制规范(存在性校验、反驳性检查、去重率报告、人类在环等)</td>
+</tr>
+<tr>
+<td>版权</td>
+<td>再分发受版权摘要 / TDM 越界 / 语料越权共享 / 训练数据来源</td>
+<td>16.1–16.2 策略;语料存内部、只共享 DOI 清单;全文引导回原站</td>
+</tr>
+<tr>
+<td>API 合规</td>
+<td>条款过时、超额封禁</td>
+<td>按 16.3 最新条款配置速率;polite pool 带 mailto;条款季度复查(OpenAlex 2026 变更即为教训)</td>
+</tr>
+<tr>
+<td>数据质量</td>
+<td>撤稿滞后 / 论文工厂 / 引用操纵 / LLM 过度概括与幻觉</td>
+<td>15.1–15.3 全套机制</td>
+</tr>
+<tr>
+<td>评价伦理</td>
+<td>影响因子滥用 / 学科偏见 / 推荐偏见</td>
+<td>第 5 章 DORA 合规六规则;学科内百分位;推荐理由可解释;人文社科覆盖不足显式声明</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>关键不确定性(移交决策层)</strong>:LAION 二审对"自然语言权利保留是否机器可读"的认定待判决原文;Bartz v. Anthropic 15 亿美元和解最终批准结果未确证;英国 TDM 改革方向未定;Unpaywall/CORE 许可未核实。</p>
+<h2 id="17-推荐的最小可行产品-mvp">17. 推荐的最小可行产品(MVP)</h2>
+<p>划定原则:只用<strong>免费、许可清晰、方法已被实证验证</strong>的组件;先做窄(1–2 个学科)不做宽。</p>
+<h3 id="17-1-mvp-功能列表">17.1 MVP 功能列表</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>功能</th>
+<th>依托</th>
+<th>排除说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>主题档案创建:自然语言描述 + 种子论文(11.2 锚定层+符号层+向量层)</td>
+<td>OpenAlex topics + SPECTER2 嵌入</td>
+<td>暂不做参数层用户自定义</td>
+</tr>
+<tr>
+<td>2</td>
+<td>每日增量采集(单学科起步:CS 用 arXiv+OpenAlex+DBLP,或生医用 PubMed+Europe PMC+bioRxiv)</td>
+<td>第 3 章推荐组合</td>
+<td>商业源全部推迟</td>
+</tr>
+<tr>
+<td>3</td>
+<td>去重 + 预印本↔正式版合并 + 撤稿每日同步</td>
+<td>DOI/OpenAlex ID + RW CSV</td>
+<td>—</td>
+</tr>
+<tr>
+<td>4</td>
+<td>venue 五级分级(查表制)</td>
+<td>SCImago CSV + CCF/ICORE + DOAJ + 预警名单</td>
+<td>JCR 推迟(需订阅)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>六维评分的<strong>简化版</strong>:相关性 + 时效性 + venue 质量 + 可信度红旗(撤稿/预警 venue)四维</td>
+<td>第 6 章</td>
+<td>创新度与冷启动影响力预测推迟(需自建模型)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>周报:速览 + 必读 3–5 篇(完整卡片)+ 值得关注 + 覆盖声明</td>
+<td>第 8、10 章模板</td>
+<td>月报推迟到有 ≥2 个月数据后</td>
+</tr>
+<tr>
+<td>7</td>
+<td>论文卡片:三类陈述强制区分 + 引用锚定 + 质量门禁</td>
+<td>8.2、15.3</td>
+<td>—</td>
+</tr>
+<tr>
+<td>8</td>
+<td>用户反馈按钮(有用/无关/已读)回流向量层</td>
+<td>11.3</td>
+<td>—</td>
+</tr>
+<tr>
+<td>9</td>
+<td>每期人工抽检队列(重点推荐 100% 过人审)</td>
+<td>12.2</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>MVP 明确不做</strong>:趋势六类标签(需 ≥12 个月数据积累,先只做"本周升温主题"的 burst 告警)、研究空白识别(风险最高,推迟到二期且首发即带 9.5 全部门禁)、商业数据源、多学科并行。</p>
+<h3 id="17-2-mvp-验证指标">17.2 MVP 验证指标</h3>
+<ul>
+<li>推送精度:用户标记"有用"占比 ≥40%(对标 Scholar Inbox 类产品的可用线);</li>
+<li>覆盖率:与领域专家手工清单对比,重要论文漏检率 &lt;10%;</li>
+<li>质量门禁:引用/链接错误率 0(硬指标);摘要过度概括抽检率 &lt;5%(人工抽检,基线是 LLM 裸输出的 26–73%);</li>
+<li>时效:论文公开到进入周报 ≤7 天。</li>
+</ul>
+<h2 id="18-后续迭代路线">18. 后续迭代路线</h2>
+<ul>
+<li><strong>二期(MVP+3–6 个月)</strong>:月报与趋势标签(数据积累后);六维评分完整版(补创新度、冷启动影响力预测);第二学科上线(验证参数层可配置性);Bluesky 开放 altmetrics 管道。</li>
+<li><strong>三期</strong>:研究空白识别(带 9.5 全套门禁,先内测后公开);证据缺口矩阵可视化;商业源接入评估(Springer API → 机构订阅场景的 Scopus);scite 引用语境集成谈判。</li>
+<li><strong>长期</strong>:跨学科并行、基金先行信号(NIH/NSF)、专利关联(The Lens)、人文社科覆盖改善、自有标注语料的方法学产出(9.2 的元发现)。</li>
+<li><strong>每季度固定动作</strong>:评分权重回测校准;API 条款复查;venue 分级表年度刷新(见 5.4)。</li>
+</ul>
+<h2 id="19-核心参考资料">19. 核心参考资料</h2>
+<p>各章已内嵌来源,此处只列<strong>决定架构的关键来源</strong>:</p>
+<ul>
+<li><strong>数据源官方文档</strong>:developers.openalex.org(2026 信用额度制)、api.crossref.org、NCBI E-utilities(NBK25497)、europepmc.org/RestfulWebService、info.arxiv.org/help/api、api.biorxiv.org、dev.elsevier.com(配额与政策)、dev.springernature.com、developer.ieee.org/API_Terms_of_Use2</li>
+<li><strong>评价体系</strong>:Clarivate JCR 2026 release;中科院分区停更声明(las.cas.cn, 2026-03-27);CCF 第七版(ccf.org.cn, 2026-03-05);ICORE 门户;sfdora.org;Leiden Manifesto(DOI:10.1038/520429a);coara.org</li>
+<li><strong>方法学奠基</strong>:Small 1973;Kessler 1963;Boyack &amp; Klavans 2010;Kleinberg 2002;Rotolo et al. 2015;Grootendorst 2022(BERTopic);Cohan et al. 2020(SPECTER);Bornmann et al. 2021(4.1%/年基线)</li>
+<li><strong>空白识别</strong>:Robinson et al. 2011(PMID 21937195);Miles 2017;Lahav et al. 2022(arXiv:2108.13751);LimitGen 2025(arXiv:2507.02694);3ie EGM;Brown et al. 2006 EPICOT(PMC1602035)</li>
+<li><strong>LLM 可靠性</strong>:Si et al. 2024/2025(arXiv:2409.04109 / 2506.20803);Beel et al. 2025(arXiv:2502.14297);Peters &amp; Chin-Yee 2025(过度概括 OR=4.85);Chelli et al. 2024(幻觉引用);Liang et al. 2024(NEJM AI)</li>
+<li><strong>合规</strong>:Crossref/Retraction Watch(gitlab.com/crossref/retraction-watch-data);EU DSM 指令 Art.3/4;AI Act Art.53;各 API ToS(16.3)</li>
+</ul>
+<h2 id="20-结论与推荐方案">20. 结论与推荐方案</h2>
+<p><strong>一句话方案</strong>:以 OpenAlex⊕Crossref 为多学科主干、学科专用源(arXiv/PubMed 系)为增量入口,免费开放数据做底座;venue 分级用"五级规则引擎 + DORA 合规约束";论文评估用"六维可解释评分 + 可信度扣分制";趋势用"SPECTER2 聚类 + 七组指标 + 六类标签规则";空白识别用"gap 分类学 + 检索增强抽取 + 六维机会框架 + 零幻觉门禁";交付形式为带覆盖声明的周报/月报。</p>
+<p><strong>五个最重要的调研结论</strong>:
+1. <strong>数据层</strong>:免费开放数据(OpenAlex/Crossref/PubMed/arXiv)足以支撑 MVP 及以后很长阶段;商业源只是增值层。但 OpenAlex 2026 信用额度制改变了"无限免费"的假设,采集预算需要精算。
+2. <strong>评价层</strong>:2026 年是评价体系变局年(中科院分区停更、CCF 第七版、ICORE2026)——分级表必须做成带快照日期的可更新配置,且整个评价层受 DORA/Leiden/CoARA 合规约束。
+3. <strong>评估层</strong>:LLM 在论文评估中"能用但必须戴镣铐"——过度概括率 26–73%、提示词无效、自评估准确率仅 53.3%,所以一切 LLM 输出都要过结构化门禁 + 引用锚定 + 人工抽检。
+4. <strong>机会层</strong>:研究空白识别是差异化核心也是风险核心,ideation-execution gap 的实证(执行后排名反转)要求系统永远输出"有证据的候选 + 不确定性",绝不输出"确定可行的方向"。
+5. <strong>市场层</strong>:15 款竞品无一同时具备"个性化推送 + 显式多维评分 + 自动周报月报 + 研究空白识别",定位空档真实存在;可信度/可复现性信号(撤稿库已免费、SciScore、statcheck)是最易建立的护城河。</p>
+</div></main>
+</div>
+<script>
+(function(){
+  var btn=document.querySelector('.toc-toggle'),nav=document.querySelector('nav.toc');
+  btn.addEventListener('click',function(){
+    var open=nav.classList.toggle('open');btn.setAttribute('aria-expanded',open);});
+  nav.addEventListener('click',function(e){
+    if(e.target.closest('a')&&window.innerWidth<=900){nav.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  var links=[].slice.call(document.querySelectorAll('.toc-link'));
+  var map={};links.forEach(function(l){map[l.getAttribute('href').slice(1)]=l;});
+  var current=null;
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        if(current)current.classList.remove('active');
+        current=map[en.target.id];if(current)current.classList.add('active');
+      }});
+  },{rootMargin:'0px 0px -75% 0px'});
+  Object.keys(map).forEach(function(id){var el=document.getElementById(id);if(el)obs.observe(el);});
+})();
+</script>
