@@ -6,7 +6,8 @@ lake:
     medicine: 27
     mathematics: 26
   daily_request_budget: 100        # 无 key $0.01/天 ≈ 100 次 list;有 key 放宽到 8000
-  mailto: "gairy.yu@gmail.com"
+  lookback_days: 14                # 免费层回看窗口(from_created_date 为 Premium 限定,2026-07 实测)
+  mailto: "you@example.com"        # 用环境变量 PAPERWATCH_MAILTO 覆盖(勿提交真实邮箱)
 
 arxiv:
   categories: ["cs.CL", "cs.LG"]
@@ -36,10 +37,10 @@ ranking:                            # kb 11.2 Scholar Inbox 配方
 
 credibility:                        # kb 6.5 扣分制(独立于加权和)
   start: 100
-  retracted: "veto"                 # 综合分置 0 + 红旗(公式外覆盖)
-  warning_venue_cap: 20             # 可信度 ≤20 且档位封顶"收录可查"
+  warning_venue_cap: 20             # 可信度 ≤20 且档位封顶"收录可查"(report 层执行封顶)
   pubpeer_hit: -30                  # 并转人工
   preprint: -10
+  # 撤稿 = 一票否决(综合分置 0 + 红旗),为公式外硬规则,不作为可调参数
 
 report:                             # kb 10.1 流量预算(硬上限)
   must_read_min: 3
@@ -47,3 +48,4 @@ report:                             # kb 10.1 流量预算(硬上限)
   worth_attention_max: 15
   weekly_total_cap: 20
   recency_window_days: 7
+  listing_only_credibility: 20      # 可信度 <= 此值 -> 档位封顶"收录可查"(kb 6.5)

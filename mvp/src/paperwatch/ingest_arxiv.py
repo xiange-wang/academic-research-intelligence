@@ -41,6 +41,6 @@ def fetch(categories: list[str], date_from: str, date_to: str, cfg: dict,
                 doc_type="preprint",
                 source="arxiv",
             ))
-        start += page
+        start += len(entries)   # 按实际条目推进(评审 L7:API 可能返回不满页)
         time.sleep(cfg["rate_limit_seconds"])   # 官方 ToU 限速
     return papers

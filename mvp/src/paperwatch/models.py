@@ -20,6 +20,7 @@ class Paper:
     is_retracted: bool = False
     source: str = "openalex"
     versions: list[str] = field(default_factory=list)   # 版本合并历史(kb 15.4)
+    extra: dict = field(default_factory=dict)           # referenced_works/topic/cited_by 等(kb 14.1,入库时拆表)
 
     def key_candidates(self) -> list[str]:
         return [k for k in (self.doi, self.arxiv_id, self.openalex_id) if k]

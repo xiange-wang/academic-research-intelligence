@@ -17,8 +17,9 @@ class Embedder:
     """可替换实现:生产用 GTE 类 sentence-transformers(kb 7.3 选型,待实验 7 裁决);
     骨架用 HashingVectorizer 保证零依赖可测。接口不变,换实现不改调用方。"""
 
-    def __init__(self, dim: int = 256):
+    def __init__(self, dim: int = 256, no_abstract_penalty: float = 0.3):
         self._vec = HashingVectorizer(n_features=dim, alternate_sign=False, norm="l2")
+        self._no_abs_conf = 1.0 - no_abstract_penalty   # 配置驱动(评审 L2)
 
     def embed(self, papers: list[Paper]) -> tuple[np.ndarray, np.ndarray]:
         """返回 (矩阵, 置信度向量)。无摘要 -> 仅标题 + 置信度降级。"""
@@ -29,7 +30,7 @@ class Embedder:
                 conf.append(1.0)
             else:
                 texts.append(p.title)
-                conf.append(0.7)  # 由 config.no_abstract_confidence_penalty 推得
+                conf.append(self._no_abs_conf)
         return self._vec.transform(texts).toarray(), np.array(conf)
 
 
@@ -38,7 +39,8 @@ class ProfileRanker:
 
     def __init__(self, cfg: dict, embedder: Embedder | None = None):
         self.cfg = cfg
-        self.embedder = embedder or Embedder()
+        self.embedder = embedder or Embedder(
+            no_abstract_penalty=cfg.get("no_abstract_confidence_penalty", 0.3))
         self.pos: list[Paper] = []
         self.neg: list[Paper] = []
         self._clf: LogisticRegression | None = None

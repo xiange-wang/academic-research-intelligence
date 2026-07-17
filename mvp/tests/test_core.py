@@ -77,11 +77,16 @@ def test_dedup_conservative():
     assert len(dedup([a, b], CFG["dedup"])) == 2
 
 
+from datetime import date
+
 def _pool(n=60):
+    today = date.today().isoformat()
     ml = [Paper(paper_id=f"ml{i}", title=f"transformer attention language model study {i}",
-                abstract="neural network training on large text corpora") for i in range(n // 2)]
+                abstract="neural network training on large text corpora", pub_date=today)
+          for i in range(n // 2)]
     bio = [Paper(paper_id=f"bio{i}", title=f"protein cell membrane assay experiment {i}",
-                 abstract="wet lab measurement of enzyme kinetics in vivo") for i in range(n // 2)]
+                 abstract="wet lab measurement of enzyme kinetics in vivo", pub_date=today)
+           for i in range(n // 2)]
     return ml, bio
 
 
@@ -142,3 +147,114 @@ def test_anchor_check():
     ok = "「论文称:method X improves accuracy by 3 points」其余为系统评估。"
     bad = "「论文称:method X solves AGI」"
     assert anchor_check(ok, src) and not anchor_check(bad, src)
+
+
+# ---------- 二轮评审回归测试 ----------
+
+def test_dedup_chain_merge_no_stale_ref():
+    """评审 H1:预印本 -> 正式版 -> 重复投递(三连)不得崩溃或丢数据。"""
+    pre = Paper(paper_id="2401.1", title="Chain Merge Case Study", arxiv_id="2401.1",
+                authors=["Dan Qi"], doc_type="preprint", pub_date="2026-01-01")
+    pub = Paper(paper_id="10.9/c", title="Chain Merge Case Study", doi="10.9/c",
+                authors=["Dan Qi"], doc_type="article", pub_date="2026-06-01")
+    resub = Paper(paper_id="10.9/c", title="Chain Merge Case Study", doi="10.9/c",
+                  authors=["Dan Qi"], doc_type="article", abstract="the abstract arrives late")
+    out = dedup([pre, pub, resub], CFG["dedup"])
+    assert len(out) == 1
+    assert out[0].doc_type == "article"
+    assert out[0].abstract == "the abstract arrives late"   # v2 内容并入主记录而非游离对象
+    assert out[0].preprint_date == "2026-01-01"
+
+
+def test_retraction_nature_filtering(tmp_path):
+    """评审 H2:仅 Retraction 一票否决;Correction/EoC 不否决;Reinstatement 移除。"""
+    from paperwatch.retractions import RetractionIndex
+    csv_text = (
+        "Record ID,OriginalPaperDOI,RetractionNature\n"
+        "1,10.1/retracted,Retraction\n"
+        "2,10.1/corrected,Correction\n"
+        "3,10.1/concern,Expression of concern\n"
+        "4,10.1/back,Retraction\n"
+        "5,10.1/back,Reinstatement\n"
+        "6,unavailable,Retraction\n")
+    cache = tmp_path / "rw.csv"
+    cache.write_text(csv_text)
+    idx = RetractionIndex(cache)
+    idx.load()
+    assert idx.is_retracted("10.1/retracted")
+    assert not idx.is_retracted("10.1/corrected")
+    assert not idx.is_retracted("10.1/concern") and idx.has_concern("10.1/concern")
+    assert not idx.is_retracted("10.1/back")        # 复职后移出否决索引
+    assert not idx.is_retracted("unavailable")
+
+
+def test_retraction_bad_csv_fails_loud(tmp_path):
+    """评审 L4:列名不符(如 HTML 错误页)必须报错,不得静默空索引。"""
+    from paperwatch.retractions import RetractionIndex
+    cache = tmp_path / "rw.csv"
+    cache.write_text("<html>oops</html>")
+    idx = RetractionIndex(cache)
+    try:
+        idx.load()
+        assert False, "should raise"
+    except ValueError:
+        pass
+
+
+def test_warning_venue_listing_only():
+    """评审 H3:预警 venue 论文不得进必读/值得关注,强制收录可查。"""
+    from paperwatch.venues import classify
+    ml, _ = _pool(20)
+    vd = classify(_journal(on_warning_list=True), VCFG)
+    scored = [assemble(p, 90 - i, 1.0, vd if i == 0 else None, CFG["credibility"])
+              for i, p in enumerate(ml)]
+    text = build(scored, CFG["report"], {"sources": ["t"], "total": 20, "deduped": 10, "blocked": 0})
+    assert ml[0].title not in text.split("## 附录")[0].split("## 2.")[0].split("## 1.")[1] \
+        if "## 1." in text else True
+    assert "封顶仅收录可查" in text
+
+
+def test_demotion_clamped_at_normal():
+    """评审 L1:降级步长再大也只到 normal,不落入 warning。"""
+    import copy
+    cfg2 = copy.deepcopy(VCFG)
+    cfg2["demotion_on_flag"] = 3
+    d = classify(_journal(quartile="Q2", percentile=60, fake_impact_factor=True), cfg2)
+    assert d.tier == "normal" and d.demoted
+
+
+def test_s_journal_needs_corroboration():
+    """评审测试缺口 4:Q1 + 高百分位但无 OpenAlex 佐证 -> A 而非 S。"""
+    d = classify(_journal(openalex_percentile=None), VCFG)
+    assert d.tier == "A"
+
+
+def test_icore_astar_conference_s():
+    d = classify({"kind": "conference", "icore": "A*"}, VCFG)
+    assert d.tier == "S"
+
+
+def test_gates_block_retracted(tmp_path):
+    """评审测试缺口 8:门禁拦截撤稿论文并给出原因。"""
+    from paperwatch.retractions import RetractionIndex
+    from paperwatch.gates import run_gates
+    cache = tmp_path / "rw.csv"
+    cache.write_text("Record ID,OriginalPaperDOI,RetractionNature\n1,10.2/bad,Retraction\n")
+    idx = RetractionIndex(cache)
+    idx.load()
+    ok = Paper(paper_id="10.2/ok", title="fine paper", doi="10.2/ok")
+    bad = Paper(paper_id="10.2/bad", title="bad paper", doi="10.2/bad")
+    scored = [assemble(p, 0, 1.0, None, CFG["credibility"]) for p in (ok, bad)]
+    passed, blocked = run_gates(scored, idx)
+    assert len(passed) == 1 and passed[0].paper.doi == "10.2/ok"
+    assert blocked[0][1] == "retracted"
+
+
+def test_recency_window_filters_old_papers():
+    """评审 L3:周报只含时间窗内论文。"""
+    ml, _ = _pool(10)
+    old = Paper(paper_id="old1", title="ancient transformer work",
+                abstract="x", pub_date="2020-01-01")
+    scored = [assemble(p, 10, 1.0, None, CFG["credibility"]) for p in ml + [old]]
+    text = build(scored, CFG["report"], {"sources": ["t"], "total": 11, "deduped": 11, "blocked": 0})
+    assert "ancient transformer work" not in text

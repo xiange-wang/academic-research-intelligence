@@ -7,5 +7,9 @@ DEFAULT = pathlib.Path(__file__).resolve().parents[2] / "config" / "default.yaml
 
 
 def load(path: pathlib.Path | None = None) -> dict:
+    import os
     with open(path or DEFAULT, encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        cfg = yaml.safe_load(f)
+    if os.environ.get("PAPERWATCH_MAILTO"):      # 真实邮箱走环境变量,不进仓库
+        cfg["lake"]["mailto"] = os.environ["PAPERWATCH_MAILTO"]
+    return cfg

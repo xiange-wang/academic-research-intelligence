@@ -78,7 +78,9 @@ def classify(v: dict, cfg: dict, snapshot: str | None = None) -> VenueDecision:
     tier, rules = _base_tier(v, cfg)
     demoted = False
     if flags and tier in ("S", "A", "B"):   # v1.3 降级规则:显式降一级,不静默跌底
-        tier = TIERS[TIERS.index(tier) + cfg.get("demotion_on_flag", 1)]
+        # 钳制:降级最低到 normal,不得因降级步长落入 warning(评审 L1)
+        new_idx = min(TIERS.index(tier) + cfg.get("demotion_on_flag", 1), TIERS.index("normal"))
+        tier = TIERS[new_idx]
         rules.append("demoted-by-flag")
         demoted = True
     return VenueDecision(tier, rules, flags, demoted, v, snapshot)

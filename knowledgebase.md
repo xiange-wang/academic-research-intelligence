@@ -79,7 +79,7 @@
 - **API**:`api.openalex.org`。**2025–2026 重大变化**:文档迁移至 developers.openalex.org,引入免费 API Key + 基于成本(credit)的限流模型——持 key 每天 $1 免费额度(list 查询 $0.0001/次、search $0.001/次、内容下载 $0.01/次、单条查询免费);无 key 每天仅 $0.01。
 - **付费**:Premium 提供更高限额、月度快照、**每日变更文件**(daily change files——注意:每日增量文件现属付费功能),价格未公开(未核实)。
 - **数据质量**:引文关系、倒排索引摘要、作者/机构消歧(ORCID、ROR)。许可 **CC0,可商用**。
-- **增量**:支持按主题/关键词/日期过滤(`from_created_date`/`from_updated_date` 参数名以最新官方文档为准)。
+- **增量**:支持按主题/关键词/日期过滤。**实测(2026-07-17):`from_created_date` 为 Premium 限定过滤器**(免费层返回 "Plan upgrade required"),`from_updated_date` 同系列推定相同;免费层增量只能用 `from_publication_date` + **回看窗口重扫**(如每日回看 14 天,由去重吸收重复),更早的回填靠季度 snapshot 兜底。
 - **对本系统的含义**:免费额度下做全学科每日增量需要精细预算;或接受月度快照 + 免费 API 补拉的混合模式。
 
 #### 3.1.2 Crossref —— DOI 权威源
@@ -831,6 +831,10 @@ cron/systemd + PG 任务表(Procrastinate;DAG 复杂化后升 Prefect 3 / Dagste
 
 **迁移路径(只改部署拓扑不改 schema,满足 2.3 多租户约束)**:第 0 天起用 SQLite/PG 双方言兼容 schema;向量统一 float32(sqlite-vec blob ↔ pgvector 无损);检索层封装为薄模块(FTS5→tsvector 是唯一适配点);发送后端抽象 sender 接口(Resend→SES)。全程无推倒重来点。
 
+**湖文件落点(v1.4 裁决,评审 R1)**:SQLite 湖文件**绝不进 git repo**——粗算单学科 3.5–8 GB/年,首月即破 GitHub 100MB 单文件硬限。落点:Cloudflare R2 免费层(10GB,够约 2 年)或 GitHub Releases(单文件 2GB),每次 GHA run 拉取/回传;repo 只放代码与渲染后的报告。
+
+**现状声明**:`mvp/` 骨架当前用 JSONL 文件存储,是**临时形态**——补齐清单第 1 件即迁入本章 SQLite schema(见 mvp/README 升级点标注)。
+
 ### 13.2 关键裁决与理由(逐项)
 
 | 选型项 | 裁决 | 落选者与理由 |
@@ -843,8 +847,8 @@ cron/systemd + PG 任务表(Procrastinate;DAG 复杂化后升 Prefect 3 / Dagste
 | 批处理 | **DuckDB 1.4 LTS + OpenAlex 官方 Parquet 副本**(s3 免费匿名下载,可按分区只取单学科) | Spark(单机 JVM 税);自建 JSONL→Parquet 管道(官方已提供 Parquet,此路线已被消灭) |
 | PDF 解析 | **GROBID 0.9(Apache-2.0,CPU)引文/结构 + Docling(MIT)正文→Markdown**;GPU 预算时 MinerU 提质量 | marker(权重 OpenRAIL-M 有 $2M 营收门槛);pymupdf4llm(AGPL 灰区);Unstructured(重心转商业);**Science Parse/papermage 确认已死** |
 | LLM 编排 | **裸官方 SDK + 原生 structured output(Pydantic schema)+ instructor/pydantic-ai** | LangGraph/Haystack(本项目无多步 agent 负载,为不存在的复杂度付抽象税);LlamaIndex(定位漂移向商业解析)。Pydantic schema 强制锚点/证据字段,与 8.2/15.3 反幻觉规范正向咬合 |
-| 嵌入 | **sentence-transformers 5.6 + 本地模型**(默认 Qwen3-Embedding-0.6B(Apache-2.0),SPECTER2 作 A/B 对照);季度百万级全量租一张 4090 <$1 | 该规模成本不是决策变量(API 全家 <$50/百万篇),**决策变量是向量空间可复现性**(API 模型静默升级会破坏季度重算)与许可(jina-v3/v4、NV-Embed 非商用) |
-| 渲染推送 | Hugo + GitHub Pages + Resend(A)/ + Amazon SES(B) | **SendGrid 免费层已取消**(仅 60 天试用);**MkDocs Material 已宣布 2026-11-05 EOL**,不可为新项目选型;自建 SMTP(送达率工程不值得) |
+| 嵌入 | **sentence-transformers 5.6 + 本地模型**;**默认待实验 7 三方基准裁决(Qwen3-Embedding-0.6B vs gte-large vs SPECTER2,统一口径见 19.0)**,Qwen3-0.6B 为预设候选;季度百万级全量租一张 4090 <$1 | 该规模成本不是决策变量(API 全家 <$50/百万篇),**决策变量是向量空间可复现性**(API 模型静默升级会破坏季度重算)与许可(jina-v3/v4、NV-Embed 非商用) |
+| 渲染推送 | Hugo + GitHub Pages + Resend(A)/ + Amazon SES(B)。**前置条件**:Resend 免费层为 3000 封/月且 100 封/天、限 1 个验证域名——发本人邮箱可用测试域($0 成立);发他人需验证自有域名(~$10/年) | **SendGrid 免费层已取消**(仅 60 天试用);**MkDocs Material 已宣布 2026-11-05 EOL**,不可为新项目选型;自建 SMTP(送达率工程不值得) |
 
 ### 13.3 与 2.3 约束的对照验证
 
@@ -866,7 +870,7 @@ cron/systemd + PG 任务表(Procrastinate;DAG 复杂化后升 Prefect 3 / Dagste
 - **向量**:与主库同体(sqlite-vec / pgvector),float32,列:paper_id、model_version、vector——**model_version 必存**,季度重嵌时新旧空间不混用。
 - **全文与解析产物**:OA PDF 与 TEI/Markdown 存对象存储(本地目录 / R2),库内只存路径与 hash;**重建摘要仅存内部处理区,不进任何对外表**(16.1 硬规则)。
 - **批处理区**:DuckDB + Parquet(snapshot 分区、指标回算中间表),与主库物理分离;算好的百分位/趋势指标以"快照日期版本化"写回主库查表。
-- **报告**:发布即写入不可变快照表(渲染后的 Markdown + 引用的卡片版本清单),更正通知走独立事件表。
+- **报告**:发布即写入不可变快照表(渲染后的 Markdown + 引用的卡片版本清单),更正通知走独立事件表。**栈 A 落点(v1.4)**:双落点——SQLite report 表 + Hugo 页面经 git 提交(git 历史天然不可变,protected branch 防 force-push);更正以事件追加 + 通知,永不改历史页。
 
 ### 14.3 索引要点
 
@@ -982,7 +986,7 @@ citations(src,dst) 双向索引(递归 CTE 的前提);papers 的 (pub_date, topi
 - 推送精度:用户标记"有用"占比 ≥40%(对标 Scholar Inbox 类产品的可用线);
 - 覆盖率:重要论文漏检率 <10%——主指标用**半独立交叉验证 recall**(另一独立检索方法的命中集被本系统覆盖的比例,Undermind 算法,无需全库标注);独立命中集来自**合规源的不同检索路径**(如 Europe PMC/S2 关键词检索 vs 本系统语义召回),不使用 Google Scholar 抓取;专家手工清单作辅助校验(需在 MVP 计划中安排金标准构建);
 - 质量门禁:**发布门禁拦截率 100%**(门禁项零放行;逃逸缺陷按事件复盘,不承诺"错误率 0"这种工程上无法承诺的指标);摘要过度概括抽检率 <5%(人工抽检,基线是 LLM 裸输出的 26–73%);
-- 时效:论文公开到进入周报 ≤7 天。
+- 时效:**OpenAlex 可见 → 进入周报 ≤7 天**(口径修正:部分 venue 在 OpenAlex 收录本身滞后数周,不可归责于系统;收录滞后单独监测并写入覆盖声明)。
 
 ## 18. 后续迭代路线
 
@@ -1000,13 +1004,13 @@ citations(src,dst) 双向索引(递归 CTE 的前提);papers 的 (pub_date, topi
 | 事实 | 权威口径 | 核实日期/方式 | 出现位置 |
 |---|---|---|---|
 | OpenAlex 规模 | ~3.2 亿 works(320,560,176) | 2026-07-17 API 实测 | kb 3.1.1/3.2 |
-| OpenAlex 费率 | 免费 key $1/天;无 key $0.01/天(非硬性禁止);免费 snapshot 季度更新 | 2026-07 官方文档 | kb 3.1.1/16.3;rs 3.1/4.3 |
+| OpenAlex 费率 | 免费 key $1/天;无 key $0.01/天(非硬性禁止);免费 snapshot 季度更新;**`from_created_date` 过滤器为 Premium 限定(实测 2026-07-17)**,免费层增量用 publication_date+回看窗口 | 2026-07 官方文档 + API 实测 | kb 3.1.1/16.3;rs 3.1/4.3;mvp ingest |
 | Semantic Scholar 限速 | 无 key 1000 RPS 共享池;有 key 入门 1 RPS | 2026-07 官方页逐字 | kb 3.1.5/16.3 |
 | scite 规模 | 2021 论文口径 8 亿+ 引用陈述;官网宣称 1.3B+(时点未注明) | 论文摘要核实;类分布数字待核 | kb 3.4.3/6.2;rs 2.1 |
 | Retraction Watch | 71,128 条(撤稿 65,708 / EoC 3,581 / 更正 1,494 / 复职 160) | 2026-07-16 CSV 实测 | kb 15.1 |
 | SciMuse 基准 | 100+ 位组长 × 4,400+ 条 idea | arXiv 摘要核实 | kb 9.6;rs 3.1/4.1 |
 | OpenScholar Nature 版 | Nature 650(8103):857–863, DOI:10.1038/s41586-025-10072-4 | Crossref + Ai2 官博核实 | rs 3.1/4.1 |
-| 嵌入实测结论 | GTE-Large(256 维)> SPECTER2(个性化排序场景);NV-Embed-v2 CC-BY-NC 不可商用 | Scholar Inbox 论文消融 | kb 7.3/17.1;rs 3.1 |
+| 嵌入实测结论与选型口径 | 已证:GTE-Large(256 维)> SPECTER2(个性化排序,Scholar Inbox 消融);**本系统默认嵌入待实验 7 三方基准裁决:Qwen3-Embedding-0.6B / gte-large / SPECTER2**(13.2、7.3、17.1 均以此为准);NV-Embed-v2 CC-BY-NC 不可商用 | Scholar Inbox 论文;实验 7 待做 | kb 7.3/13.2/17.1;rs 3.1 |
 | 流量预算 | 每方向每周 ≤20 篇(必读 3–5 + 值得关注 ≤15) | Feedly 生产实践(10–20 篇/feed) | kb 8.3/10.1/10.2/17.1 |
 | CCF 第七版 | 2026-03-31 正式发布(03-05 公示、04-09 勘误) | 官网核实 | kb 4 章/4.2/19 |
 
