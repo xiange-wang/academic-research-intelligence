@@ -1,6 +1,6 @@
 # 现有方案扫描与可借鉴方法
 
-> 版本:v1.0 · 调研日期:2026-07-17
+> 版本:v1.1(审查修订版,见 review_report.md) · 调研日期:2026-07-17
 > 目的:全网扫描与本系统定位相近的**开源项目、商业产品、学术系统**,回答三个问题:哪些轮子不用重造、哪些方法已被验证可直接采用、我们的差异化空间是否依然成立。
 > 与 `knowledgebase.md` 的关系:knowledgebase 第 3.5 节是竞品功能清单;本文件深入到**方法与架构层**,并覆盖开源生态。
 
@@ -116,7 +116,7 @@
 - UX:Describe(AI 追问澄清)→ Explore → Build(逐篇解释"为何与你的目标相关")→ **Keep up 持续订阅**。
 
 **Elicit(准确率沟通的标杆)**
-- 2026-05 大规模评估(994 篇 Cochrane 综述):检索 recall 95.0%;摘要筛选 sensitivity 96.89% / specificity 92.54%(对照人类单人 86.6%、双人 97.5% → "超单人、近双人");提取 95.6% 正确。
+- 2026-05 大规模评估(994 篇 Cochrane 综述):检索 recall 95.0%;摘要筛选 sensitivity 96.89% / specificity 92.54%(小数位出自完整评估报告,官方博客口径为整数 97%——待核);对照人类单人 86.6%、双人 97.5% → "超单人、近双人";提取 95.6% 正确。
 - **关键演化**:2025-03 时 specificity 仅 62.8% → 一年提到 92.5%——高灵敏筛选的假阳性是最难啃的,且宣传页只报 recall。
 - 人机协作:每个结论附原文引句+高亮位置;用户可覆盖 AI 判断并记录理由;非对称阈值(Maybe 保留,strict No 才剔除)。
 - 可抄的评估协议:17 名非用户 PhD 用真实问题盲评多产品,**top-5 论断逐条核引用(正确 1 / 小错 0.5 / 大错 0)**+ Wilcoxon 检验。
@@ -124,7 +124,7 @@
 
 **scite(引用语境分类的全部工程细节 + 反面教材)**
 - 管线:GROBID(PDF)+ Pub2TEI(出版商 XML)统一 TEI → biblio-glutton 对 Crossref 匹配;引用语境定位率 PDF 路径 ~70%、XML 路径 ~95%。
-- 分类器:SciBERT 微调;5 万条专家标注;**真实分布 mentioning 92.6% / supporting 6.5% / disputing 0.8%** 的极端不平衡是根本难题;生产原则:**调类权重保证每类 precision>80%,宁漏勿错**。当前 disputing P .85 / R .45。
+- 分类器:SciBERT 微调;5 万条专家标注;**真实分布 mentioning 92.6% / supporting 6.5% / disputing 0.8%** 的极端不平衡是根本难题;生产原则:**调类权重保证每类 precision>80%,宁漏勿错**。当前 disputing P .85 / R .45(分布与 P/R 数字出自 2021 论文正文,本次未能回溯核实——待核)。
 - **第三方打脸数据(必读)**:Bakker et al. 实测 324 条引用撤稿文献的引文,人工判 contrasting 17 条,scite 判 0 条——**徽章上"0 条反驳"多半是"没抓到"而非"没人反驳",缺失 ≠ 不存在**,UI 必须提示覆盖率。
 
 **Consensus(聚合 meter 的护栏设计)**
@@ -179,7 +179,7 @@
 
 ### 3.1 系统笔记
 
-**OpenScholar(UW + Ai2 → Nature 2026-02 正式发表)** — arXiv:2411.14199,Apache-2.0 全开源(代码/模型/数据/datastore)
+**OpenScholar(UW + Ai2)** — arXiv:2411.14199,Apache-2.0 全开源(代码/模型/数据/datastore);据称正式版发表于 Nature 2026-02(**未能直接核实条目——待核**)
 - 数据:peS2o 4500 万论文,正文按 **250 词切 chunk、chunk 前拼论文标题**,2.34 亿 passages。
 - 检索器训练配方(可直接照搬):bi-encoder = Contriever 在 peS2o 上继续对比学习;cross-encoder = BGE-reranker,训练数据**自合成**(摘要生成 query → 召回 top-10 → Llama 3 70B 打 1–5 分,4–5 为正例)。
 - Pipeline:检索→重排→初稿→**自反馈迭代(≤3 条,信息不足则补检索)**→**逐句引用验证**。
@@ -203,8 +203,8 @@
 
 **自动科研 agent(AI-Scientist / Agent Laboratory 类)——主要是反面教训**
 - Agent Laboratory:自动评审 6.1 分 vs 人类 3.8 分,**系统性虚高**;"成本降 84%"的基线是 AI Scientist 而非人类。
-- MLR-Bench:**约 80% 案例含伪造/未验证实验结果**;PaperBench:最佳模型复现分 21%,未超 PhD;LLM 评审可被 prompt 注入操纵至"100% 接收级评分"(arXiv:2509.10248)。
-- Kosmos(2025-11):数据分析陈述准确率 85.5%、文献综述 82.1%,**结论性陈述仅 57.9%**——越接近"下结论"越不可靠。
+- MLR-Bench:**约 80% 案例含伪造/未验证实验结果**(转述自论文正文,未回溯核实——待核);PaperBench:最佳模型复现分 21%,未超 PhD;LLM 评审可被 prompt 注入操纵至"100% 接收级评分"(arXiv:2509.10248)。
+- Kosmos(2025-11):数据分析陈述准确率 85.5%、文献综述 82.1%,**结论性陈述仅 57.9%**(三个数字转述自论文正文,未回溯核实——待核)——越接近"下结论"越不可靠。
 - 社区共识分层:**可靠**=RAG+溯源的综述、结构化写作;**部分可靠**=idea 候选生成;**不可靠**=自动评分、novelty 判断、实验结果、裸 LLM 引用。
 
 **文献嵌入与个性化排序**
@@ -215,8 +215,8 @@
 **知识图谱路线的研究空白识别(最有直接价值)**
 - **Impact4Cast**(arXiv:2402.08640, MLST 2025,代码 MIT + 全量数据):2100 万论文→概念演化图(37,960 概念)→138 维图特征→**预测"从未共同研究过的概念对"的未来引用影响,AUC>0.9**。"研究空白"被操作化为**高预测影响但尚无连边的概念对**。
 - **Sourati & Evans**(Nature Human Behaviour 2023):把作者节点加入概念超图,预测提升最高 400%;反向使用可区分"快被做掉的 gap"与"人类盲点 gap"。
-- **SciMuse**(arXiv:2405.17044,代码 MIT):附带 **3,000 条研究组长排序的专家基准**,可用于离线校准 idea 排序器。
-- OpenAlex 官方 topic 分类器开源(MIT,4,516 topics 四级层级);**注意:OpenAlex 2026-02 起 API 强制 key + 每日限额、免费 snapshot 改季度更新**,大规模分析须走本地 snapshot。
+- **SciMuse**(arXiv:2405.17044,代码 MIT):附带专家基准——**100+ 位研究组长对 4,400+ 条个性化 idea 的排序**(v1.1 更正:原文误作"3,000 条"),可用于离线校准 idea 排序器。
+- OpenAlex 官方 topic 分类器开源(MIT,4,516 topics 四级层级);**注意 OpenAlex 2026 新政:事实上须申请免费 API key(无 key 额度仅 $0.01/天,并非硬性禁止)+ 每日成本额度、免费 snapshot 改季度更新**,大规模分析须走本地 snapshot。
 
 ### 3.2 按模块的借鉴映射表
 
@@ -225,7 +225,7 @@
 | 数据底座 | OpenScholar / OpenAlex | 本地 snapshot 做底库;250 词 chunk+拼标题;引用图走 S2 Graph API |
 | 检索 | OpenScholar 两段式 + PaperQA2 | bi-encoder 粗召(可直接用 OpenScholar Retriever 权重)+ cross-encoder 精排(训练数据自合成配方);方向拆 5–10 个持久化子查询并行;引用图 traversal 补漏 |
 | 个性化排序 | **Scholar Inbox 配方** | 冻结通用嵌入(避开 NC 许可)+ 每方向一个线性模型;显式负样本+隐式随机负样本;5正3负冷启动;秒级重训 |
-| 论文质量评分 | Agent Lab / MLR-Bench 反面教训 + NAIP | **不用 LLM 当绝对裁判**(虚高+可注入);客观信号 + NAIP 影响预测主排序;LLM 分仅作带依据的相对辅助;正文注入剥离 |
+| 论文质量评分 | Agent Lab / MLR-Bench 反面教训 + NAIP(arXiv:2408.03934 的题目+摘要影响力预测模型,即 knowledgebase 6.1) | **不用 LLM 当绝对裁判**(虚高+可注入);客观信号 + NAIP 影响预测主排序;LLM 分仅作带依据的相对辅助;正文注入剥离 |
 | 总结/证据汇总 | PaperQA2 RCS | 每 chunk 独立 map 出"评分+摘要"再综合;temperature=0 可审计;按环节分配模型 |
 | 报告生成 | STORM + OpenScholar | 固定大纲模板 + 多视角提问 agent(方法演进/benchmark/工程/争议)+ 成稿后 ≤3 条 self-feedback + **逐句引用只能来自 reference 池** + Reviewer 校验"每条结论有来源、日期在本周内" |
 | 趋势分析 | OpenAlex topics + BERTopic + Impact4Cast | 三路信号:Kleinberg burst、主题时序斜率、**概念图新边形成速率**;离群点当新兴主题早期信号 |
@@ -255,7 +255,7 @@
 | chunk 级"评分+摘要" | PaperQA2 RCS | LitQA2 评测,Apache-2.0 |
 | 报告生成骨架 | STORM 多视角提问+大纲评测 / deep research 框架五模式 | NAACL 2024,MIT |
 | 研究空白候选生成 | Impact4Cast(KG link prediction,AUC>0.9,代码+数据 MIT) | MLST 2025 |
-| idea 排序校准基准 | SciMuse 3,000 条专家排序 | 开源 |
+| idea 排序校准基准 | SciMuse 专家排序基准(100+ 组长 × 4,400+ 条) | 开源 |
 | 主题分类 | OpenAlex topic 分类器(4,516 topics,MIT) | 官方开源 |
 | 无 ground truth 评估 | RAGElo(LLM-judge+Elo,开源) | Zeta Alpha 生产使用 |
 
@@ -290,4 +290,4 @@
 - 可商用采用:MIT(STORM、meridian、Impact4Cast、SciMuse 等)、Apache-2.0(OpenScholar、PaperQA2、GPT Researcher、asreview 等);
 - **只能学方法不能抄代码**:zotero-arxiv-daily(AGPL)、ChatPaper / daily-arXiv-ai-enhanced / AI-Scientist(自定义许可)、NAIP 与 HKU AI-Researcher(无 LICENSE 文件);
 - **嵌入模型许可**:NV-Embed-v2(CC-BY-NC)不可商用,选 gte-large(MIT)或 Qwen3-Embedding(Apache-2.0);
-- 数据源:OpenAlex 2026 新政(强制 key+限额+快照改季度)再次确认——大规模分析走本地 snapshot。
+- 数据源:OpenAlex 2026 新政(事实上须申请免费 key + 每日成本额度 + 免费快照改季度)再次确认——大规模分析走本地 snapshot。
