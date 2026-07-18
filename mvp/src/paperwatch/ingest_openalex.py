@@ -83,13 +83,18 @@ class OpenAlexLake:
         since = since or st.get("since")
         if not since:
             raise ValueError("first run must provide --since (YYYY-MM-DD)")
-        if api_key:                       # Premium:真收录增量
+        cursor = st.get("cursor") or "*"
+        # 续拉时必须复用首轮的确切 filter(评审复审 #2):OpenAlex cursor 绑定 mint 时的
+        # query,免费层 date_filter 依赖 today 会跨天漂移使游标失效。故 incomplete 时存下
+        # active_filter 原样复用;走完或新轮才重算。
+        if st.get("incomplete") and st.get("active_filter"):
+            date_filter = st["active_filter"]
+        elif api_key:                     # Premium:真收录增量
             date_filter = f"from_created_date:{since}"
         else:                             # 免费层:发表日 + 回看窗口(dedup 吸收重复)
             lookback = self.cfg.get("lookback_days", 14)
             eff = min(date.fromisoformat(since), date.today() - timedelta(days=lookback))
             date_filter = f"from_publication_date:{eff.isoformat()}"
-        cursor = st.get("cursor") or "*"
         papers, exhausted = [], False
         for _ in range(max_pages):
             if self._budget_left() <= 0:
@@ -110,11 +115,12 @@ class OpenAlexLake:
                 cursor = None
                 break
             time.sleep(0.2)
-        if cursor:  # 预算/页数耗尽:保存真游标续拉,不推进 since,不丢已取数据
-            self.state[str(field_id)] = {"cursor": cursor, "since": since, "incomplete": True}
-        else:       # 走完:推进 since 到今天,游标复位
+        if cursor:  # 预算/页数耗尽:保存真游标 + 当轮 filter 续拉,不推进 since,不丢已取数据
+            self.state[str(field_id)] = {"cursor": cursor, "since": since,
+                                         "active_filter": date_filter, "incomplete": True}
+        else:       # 走完:推进 since 到今天,游标与 filter 复位
             self.state[str(field_id)] = {"cursor": None, "since": date.today().isoformat(),
-                                         "incomplete": False}
+                                         "active_filter": None, "incomplete": False}
         self._save()
         # exhausted 时已收集结果照常返回;调用方从 state[field]["incomplete"] 看到续拉需求
         return papers

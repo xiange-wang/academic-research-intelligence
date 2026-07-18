@@ -38,6 +38,7 @@ ranking:                            # kb 11.2 Scholar Inbox 配方
 credibility:                        # kb 6.5 扣分制(独立于加权和)
   start: 100
   warning_venue_cap: 20             # 可信度 ≤20 且档位封顶"收录可查"(report 层执行封顶)
+  expression_of_concern: -20        # RW 关注表达命中 -> 扣分 + 转人工(kb 15.1)
   pubpeer_hit: -30                  # 并转人工
   preprint: -10
   # 撤稿 = 一票否决(综合分置 0 + 红旗),为公式外硬规则,不作为可调参数

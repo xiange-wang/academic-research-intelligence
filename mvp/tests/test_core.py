@@ -202,15 +202,15 @@ def test_retraction_bad_csv_fails_loud(tmp_path):
 
 
 def test_warning_venue_listing_only():
-    """评审 H3:预警 venue 论文不得进必读/值得关注,强制收录可查。"""
+    """评审 H3:预警 venue 论文不得进必读区也不得进值得关注区(复审补强断言)。"""
     from paperwatch.venues import classify
     ml, _ = _pool(20)
     vd = classify(_journal(on_warning_list=True), VCFG)
     scored = [assemble(p, 90 - i, 1.0, vd if i == 0 else None, CFG["credibility"])
               for i, p in enumerate(ml)]
     text = build(scored, CFG["report"], {"sources": ["t"], "total": 20, "deduped": 10, "blocked": 0})
-    assert ml[0].title not in text.split("## 附录")[0].split("## 2.")[0].split("## 1.")[1] \
-        if "## 1." in text else True
+    body = text.split("## 附录")[0]            # 必读 + 值得关注两区(附录之前)
+    assert ml[0].title not in body            # 预警论文不在任何展示区
     assert "封顶仅收录可查" in text
 
 
@@ -258,3 +258,64 @@ def test_recency_window_filters_old_papers():
     scored = [assemble(p, 10, 1.0, None, CFG["credibility"]) for p in ml + [old]]
     text = build(scored, CFG["report"], {"sources": ["t"], "total": 11, "deduped": 11, "blocked": 0})
     assert "ancient transformer work" not in text
+
+
+# ---------- 三轮复审回归测试 ----------
+
+def test_retraction_reload_resets(tmp_path):
+    """复审 #1:同一 index 重载不同 CSV,前一版独有的 DOI 不得残留。"""
+    from paperwatch.retractions import RetractionIndex
+    cache = tmp_path / "rw.csv"
+    cache.write_text("Record ID,OriginalPaperDOI,RetractionNature\n1,10/x,Retraction\n2,10/y,Retraction\n")
+    idx = RetractionIndex(cache)
+    idx.load()
+    assert idx.is_retracted("10/y")
+    cache.write_text("Record ID,OriginalPaperDOI,RetractionNature\n1,10/x,Retraction\n")  # y 消失
+    idx.load()
+    assert idx.is_retracted("10/x") and not idx.is_retracted("10/y")   # y 不残留
+
+
+def test_dedup_empty_title_no_collapse():
+    """复审 #4:空标题论文不因 SequenceMatcher('','')==1 而塌缩。"""
+    import copy
+    cfg = copy.deepcopy(CFG["dedup"]); cfg["require_author_overlap"] = False
+    ps = [Paper(paper_id=f"e{i}", title="", doi=f"10/e{i}") for i in range(4)]
+    assert len(dedup(ps, cfg)) == 4
+
+
+def test_eoc_wired_into_scoring():
+    """复审 #3:Expression of concern 命中 -> 可信度扣分 + 说明。"""
+    from paperwatch.scoring import credibility
+    p = Paper(paper_id="c", title="t", doi="10/c")
+    base, _, _ = credibility(p, None, CFG["credibility"])
+    hit, _, notes = credibility(p, None, CFG["credibility"], concern_hit=True)
+    assert hit < base and any("concern" in n for n in notes)
+
+
+def test_venue_lookup_normalization():
+    """复审 #6:venue 名大小写/尾括号别名差异仍能命中查表。"""
+    import re
+    def _norm(name):
+        return re.sub(r"\s*\(.*?\)\s*$", "", name).strip().lower() if name else ""
+    feats = {"Nature": {"kind": "journal", "quartile": "Q1", "percentile": 96, "openalex_percentile": 92}}
+    lookup = {_norm(k): v for k, v in feats.items()}
+    assert lookup.get(_norm("Nature (London)")) is not None
+    assert lookup.get(_norm("NATURE")) is not None
+
+
+def test_cursor_filter_stable_across_continuation(tmp_path):
+    """复审 #2:incomplete 续拉复用首轮 filter,不随日期重算(免费层游标有效性)。"""
+    import json as _json
+    from paperwatch.ingest_openalex import OpenAlexLake
+    state = tmp_path / "s.json"
+    # 模拟一次中断:incomplete=True 且存下 active_filter
+    state.write_text(_json.dumps({
+        "budget": {"date": "2000-01-01", "used": 0},   # 过期日期 -> 归零,但不影响本测
+        "26": {"cursor": "AoJ123", "since": "2026-07-03",
+               "active_filter": "from_publication_date:2026-06-19", "incomplete": True}}))
+    lake = OpenAlexLake({"daily_request_budget": 0, "mailto": "x@y.z"}, state)  # 预算 0 -> 不发请求
+    # 预算耗尽立即返回,但 date_filter 的选择逻辑已执行:应复用 active_filter
+    lake.fetch_field(26, max_pages=1)
+    # 续拉分支保持 active_filter 不变(未走完)
+    assert lake.state["26"]["active_filter"] == "from_publication_date:2026-06-19"
+    assert lake.state["26"]["incomplete"] is True

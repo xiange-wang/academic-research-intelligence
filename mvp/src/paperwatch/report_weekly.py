@@ -91,5 +91,6 @@ def build(scored: list[ScoredPaper], cfg: dict, sources_stat: dict,
             f" → 入选 {len(must_cards) + len(worth_cards)}",
             f"- 撤稿库状态:{sources_stat.get('retraction_status', '未同步(本期未做撤稿比对!)')}",
             "- 缺失 ≠ 不存在:外部评价类信号(引用语境、社媒提及)未接入,计数为 0 不代表无争议(kb 10.1)",
-            "- 已知缺口:SSRN 无 API;人文学科覆盖薄弱;约 25–30% 论文无摘要走降级排序(实验2)"]
+            "- 已知缺口:SSRN 无 API;人文学科覆盖薄弱;约 25–30% 论文无摘要走降级排序(实验2)",
+            "- 锚点门禁仅在接入 LLM 摘要后实际生效(骨架占位卡片无「论文称」引句,恒过)"]
     return "\n".join(out)

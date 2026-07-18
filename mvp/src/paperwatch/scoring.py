@@ -8,7 +8,8 @@ from .models import Paper, ScoredPaper, VenueDecision
 
 
 def credibility(paper: Paper, venue: VenueDecision | None, cfg: dict,
-                pubpeer_hit: bool = False) -> tuple[float, bool, list[str]]:
+                pubpeer_hit: bool = False, concern_hit: bool = False
+                ) -> tuple[float, bool, list[str]]:
     """返回 (可信度分, 是否一票否决, 说明)。扣分制:满分起步按红旗扣减(kb 6.4)。"""
     notes: list[str] = []
     if paper.is_retracted:
@@ -17,6 +18,9 @@ def credibility(paper: Paper, venue: VenueDecision | None, cfg: dict,
     if venue and venue.tier == "warning":
         score = min(score, float(cfg["warning_venue_cap"]))
         notes.append("warning venue: credibility capped, listing-only tier (kb 6.5)")
+    if concern_hit:   # Expression of concern(评审复审 #3:EoC 接入扣分制)
+        score += cfg.get("expression_of_concern", -20)
+        notes.append(f"expression of concern: {cfg.get('expression_of_concern', -20)}, route to human review")
     if pubpeer_hit:
         score += cfg["pubpeer_hit"]
         notes.append("PubPeer hit: -30, route to human review")
@@ -27,8 +31,10 @@ def credibility(paper: Paper, venue: VenueDecision | None, cfg: dict,
 
 
 def assemble(paper: Paper, relevance: float, conf: float,
-             venue: VenueDecision | None, cfg: dict) -> ScoredPaper:
-    cred, vetoed, notes = credibility(paper, venue, cfg)
+             venue: VenueDecision | None, cfg: dict,
+             pubpeer_hit: bool = False, concern_hit: bool = False) -> ScoredPaper:
+    cred, vetoed, notes = credibility(paper, venue, cfg,
+                                      pubpeer_hit=pubpeer_hit, concern_hit=concern_hit)
     if paper.abstract is None:
         notes.append("no abstract: title-only embedding, confidence lowered (exp2)")
     return ScoredPaper(paper=paper, relevance=relevance, credibility=cred,

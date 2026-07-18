@@ -40,4 +40,4 @@ cd mvp && pip install -e . && python -m paperwatch.cli --help
 python -m pytest tests/ -q
 ```
 
-LLM 摘要环节为可插拔接口(`report_weekly.Summarizer`),骨架阶段输出结构化占位卡片;接入模型时必须实现三类陈述区分与引用锚定(knowledgebase 8.2,由 `gates.anchor_check` 强制)。
+LLM 摘要环节为可插拔接口(`report_weekly.Summarizer`),骨架阶段输出结构化占位卡片;接入模型时必须实现三类陈述区分与引用锚定(knowledgebase 8.2)。锚点门禁(`gates.anchor_check`)已接入报告发布路径,但**仅在接入真实 LLM 摘要后才实际拦截**——占位卡片无「论文称」引句,门禁恒过。

@@ -20,6 +20,15 @@ def _load_venue_features(path: pathlib.Path | None) -> dict:
     return {}
 
 
+def _norm_venue(name: str | None) -> str:
+    """venue 名规范化(评审复审 #6):大小写/空白/尾括号别名差异消歧。
+    生产装载器应改用 ISSN / OpenAlex source id 做键,此处为骨架近似。"""
+    import re
+    if not name:
+        return ""
+    return re.sub(r"\s*\(.*?\)\s*$", "", name).strip().lower()
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(prog="paperwatch")
     ap.add_argument("--config", type=pathlib.Path, default=None)
@@ -69,6 +78,7 @@ def main() -> None:
         raw = [Paper(**json.loads(l)) for l in store.read_text(encoding="utf-8").splitlines()]
         pool = dedup(raw, cfg["dedup"])
         vfeats = _load_venue_features(args.venues)
+        vlookup = {_norm_venue(k): v for k, v in vfeats.items()}   # 规范化键(评审复审 #6)
         prof = json.loads(args.profile.read_text())
         ranker = ProfileRanker(cfg["ranking"])
         by_id = {p.paper_id: p for p in pool}
@@ -78,11 +88,19 @@ def main() -> None:
         for pid in prof.get("negatives", []):
             if pid in by_id:
                 ranker.feedback(by_id[pid], useful=False)
-        scores, confs = ranker.score(pool, pool)
+        try:
+            scores, confs = ranker.score(pool, pool)
+        except ValueError as e:   # 冷启动样本不足(种子滚出时间窗):降级而非崩溃(评审复审 #5)
+            print(f"⚠ 个性化排序不可用({e});本期按时效降级出报告,不做相关性排序",
+                  file=sys.stderr)
+            scores = [0.0] * len(pool)
+            confs = [1.0 if p.abstract else 0.7 for p in pool]
         scored = []
         for p, s, c in zip(pool, scores, confs):
-            vd = classify(vfeats[p.venue], cfg["venue_tiers"]) if p.venue in vfeats else None
-            scored.append(assemble(p, s, c, vd, cfg["credibility"]))
+            feat = vlookup.get(_norm_venue(p.venue)) if p.venue else None
+            vd = classify(feat, cfg["venue_tiers"]) if feat else None
+            scored.append(assemble(p, s, c, vd, cfg["credibility"],
+                                   concern_hit=idx.has_concern(p.doi)))
         passed, blocked = run_gates(scored, idx)
         stat = {"sources": ["openalex"], "total": len(raw), "deduped": len(pool),
                 "blocked": len(blocked), "retraction_status": retraction_status}

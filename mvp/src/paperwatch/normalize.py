@@ -53,7 +53,7 @@ def dedup(papers: list[Paper], cfg: dict) -> list[Paper]:
         idx = next((by_key[k] for k in p.key_candidates() if k in by_key), None)
         nt = _norm_title(p.title)
         bk = _block_key(nt)
-        if idx is None:
+        if idx is None and nt:            # 空规范化标题不进模糊匹配(评审复审 #4:防空标题塌缩)
             for i in blocks.get(bk, []):  # 仅同桶内模糊匹配
                 existing_nt = norm_titles[i]
                 if abs(len(existing_nt) - len(nt)) > max(8, len(nt) // 5):

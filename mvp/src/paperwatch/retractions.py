@@ -38,27 +38,34 @@ class RetractionIndex:
         return len(self._retracted)
 
     def load(self) -> None:
-        """解析缓存 CSV。列名缺失即报错(评审 L4:防 HTML 错误页静默产出空索引)。"""
+        """解析缓存 CSV。列名缺失即报错(评审 L4:防 HTML 错误页静默产出空索引)。
+
+        每次 load 重建索引(评审复审 #1):否则守护进程下每日重载会累积已从 CSV
+        消失的陈旧撤稿记录,永不消退。
+        """
+        retracted: set[str] = set()
+        concerns: set[str] = set()
+        reinstated: set[str] = set()
         rd = csv.DictReader(io.StringIO(self.cache.read_text(errors="replace")))
         cols = rd.fieldnames or []
         doi_col = next((c for c in cols if "doi" in c.lower() and "original" in c.lower()), None)
         nature_col = next((c for c in cols if "nature" in c.lower()), None)
         if not doi_col or not nature_col:
             raise ValueError(f"unexpected RW CSV columns: {cols[:8]} (need OriginalPaperDOI + RetractionNature)")
-        reinstated: set[str] = set()
         for row in rd:
             doi = _norm_doi(row.get(doi_col) or "")
             if not doi or doi == "unavailable":
                 continue
             nature = (row.get(nature_col) or "").strip().lower()
             if nature == "retraction":
-                self._retracted.add(doi)
+                retracted.add(doi)
             elif "concern" in nature:
-                self._concerns.add(doi)
+                concerns.add(doi)
             elif nature == "reinstatement":
                 reinstated.add(doi)
             # correction:不否决(kb 6.5 语义)
-        self._retracted -= reinstated
+        self._retracted = retracted - reinstated
+        self._concerns = concerns
         self.loaded = True
 
     def is_retracted(self, doi: str | None) -> bool:
