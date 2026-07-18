@@ -2,13 +2,13 @@
 
 按 `../knowledgebase.md` v1.4 的方法论实现的最小可行产品骨架。每个模块头部注释标注其对应的知识库章节。
 
-## ⚠ 骨架状态声明(评审后,2026-07-17)
+## ⚠ 骨架状态声明(2026-07-17 修复轮后)
 
 - **存储层为临时形态**:当前 JSONL append 存储;定稿为 kb 第 14 章 SQLite schema(补齐清单第 1 件)。**湖文件不进 git**(kb 13.1:R2 / Releases)。
-- **门禁 2/3 项未接线**:链接可达性默认关闭、`anchor_check` 未接入流水线(LLM 摘要为占位);撤稿索引缺失时目前静默放行(待 fail-loud)。
-- **venue 引擎无数据装载器**:`classify()` 规则已测,但 SCImago/CCF/ICORE/DOAJ 名单装载器未实现,CLI 当前传 `venue=None` → demo 周报中预印本可信度未受 venue 信号约束。
+- **门禁部分接线**:`anchor_check` 已接入报告发布路径(拦截「论文称」引句无法定位的卡片);撤稿库缺失已 fail-loud(须显式 `--allow-stale-retractions`)。**仍缺**:链接可达性默认关闭(BACKLOG #8)、撤稿索引时新性检查未做。
+- **venue 引擎装载器未实现**:`classify()` 规则已测,CLI 已预留 `--venues` JSON 查表接口;但 SCImago/CCF/ICORE/DOAJ 名单的装载器(BACKLOG #5)未实现,缺省时 venue 信号不参与。
 - **嵌入为 Hashing 占位**:生产嵌入待实验 7 三方基准(Qwen3-0.6B / gte-large / SPECTER2)裁决。
-- 完整"骨架 → 栈 A 补齐清单"(14 件,关键路径约 8–10 人天)见架构评审报告。
+- 完整"骨架 → 栈 A 补齐清单"(14 件,关键路径约 8–10 人天)见 [`BACKLOG.md`](BACKLOG.md)。
 
 ## 模块地图(对应 knowledgebase 章节)
 

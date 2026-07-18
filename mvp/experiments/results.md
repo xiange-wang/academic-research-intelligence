@@ -13,7 +13,7 @@
 | 2026-07-14(周二) | 40,511 |
 
 **结论**:日均约 3.5 万(周末低谷 1.8 万、周一回填峰 4.9 万),略高于 kb 2.3 的 2.5–3 万估算但同量级;按 200 条/页,全学科日增 ≈ 90–250 次 list 调用——**无 key 预算(~100 次/天)对全学科不够,对单学科充裕**;有免费 key($1/天 ≈ 万次)则全学科无压力。→ MVP 必须申请免费 key。
-**待补**:`from_updated_date` 流量(引用刷新)未测——需要 key 后连续 7 天实测(原实验 1 主体)。
+**待补**:`from_updated_date` 流量(引用刷新)未测。注意 `from_created_date` 已确认为 Premium 限定(见下),实验 1 主体须先验证 `from_updated_date` 是否同属 Premium——若是,引用刷新只能走季度 snapshot。
 
 ## 实验 2:摘要覆盖率 — 2026-07-17
 
@@ -29,11 +29,11 @@
 
 ## 新发现(2026-07-17,冒烟测试中实测):`from_created_date` 是 Premium 限定过滤器
 
-免费层请求返回 `"Plan upgrade required"`。影响:免费层无法按"收录时间"做真增量,已改用 **`from_publication_date` + 14 天回看窗口**策略(每日重扫,dedup 吸收重复;实测 8,810 篇采集去重后 5,624,重复率 36% 被正常吸收,总耗时 <2s)。评审 M2 的"改用 from_created_date"仅在有 Premium key 时可行,代码已实现双路径。
+免费层请求返回 `"Plan upgrade required"`。影响:免费层无法按"收录时间"做真增量,已改用 **`from_publication_date` + 14 天回看窗口**策略(每日重扫,dedup 吸收重复;实测 8,810 篇采集去重后 5,624,重复率 36% 被正常吸收,总耗时 <2s)。代码已实现双路径:有 Premium key 时用 `from_created_date`,免费层用回看窗口。
 
-## 实验 1 的口径警示(评审 A5/R7)
+## 实验 1 的口径警示
 
-上表按 `publication_date` 计数是**回填视角**:高估峰值、且晚收录的旧论文会在 since 推进后漏采。采集游标已定为 `from_created_date`(收录时间);拿到免费 key 后立即做实验 1 主体(`from_updated_date` 7 天连测——它决定引用刷新是否吃穿 $1/天)。
+上表按 `publication_date` 计数是**回填视角**:高估峰值、且晚收录的旧论文会在 since 推进后漏采。游标语义定为收录时间:有 Premium key 时用 `from_created_date`,免费层以 `from_publication_date`+回看窗口近似(代码双路径)。
 
 ## 未完成实验(需要资源/时间)
 
